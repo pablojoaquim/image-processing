@@ -90,8 +90,16 @@ int opencv_test()
               << "G=" << (int)pixel[1] << std::endl
               << "R=" << (int)pixel[2] << std::endl;
 
+    // Show the image
     cv::imshow("OpenCV en WSL", img);
     cv::waitKey(0);
+
+    // Grayscale conversion (this is very useful for objects and borders detection)
+    cv::Mat gray;
+    cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY); // cvtColor: convert between color spaces
+    cv::imshow("Gray", gray);
+    cv::waitKey(0);
+
     cv::destroyAllWindows();
     return 0;
 }
