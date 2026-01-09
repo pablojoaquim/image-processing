@@ -137,6 +137,16 @@ int opencv_test()
     cv::imshow("Blurred", blurred);
     cv::waitKey(0);
 
+    // Edges detection (typical proces is Color -> Gray -> Blur -> Edges)
+    cv::Mat edges;
+    // The function finds edges in the input image and marks them in the output map 
+    // edges using the Canny algorithm. The smallest value between threshold1 and 
+    // threshold2 is used for edge linking. The largest value is used to find initial 
+    // segments of strong edges.
+    cv::Canny(blurred, edges, 50, 150);
+    cv::imshow("Edges", edges);
+    cv::waitKey(0);
+
     cv::destroyAllWindows();
     return 0;
 }
