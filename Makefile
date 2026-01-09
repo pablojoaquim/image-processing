@@ -32,6 +32,12 @@ COVERAGE_DIR  = $(BUILD_DIR)/coverage
 CPPCHECK_DIR  = $(BUILD_DIR)/cppcheck
 
 # ===============================
+# Runtime assets
+# ===============================
+ASSETS_DIR = src/assets
+ASSETS = lenna.png
+
+# ===============================
 # Windows \ → /
 # ===============================
 ifeq ($(OS),Windows_NT)
@@ -57,6 +63,17 @@ CPP_TEST_FILES 	= $(foreach d,$(TEST_DIRS),$(wildcard $(d)/test_*.cpp))
 # ===============================
 CFLAGS += $(foreach dir,$(SRC_DIRS), -I$(dir))
 CXXFLAGS += $(foreach d,$(SRC_DIRS), -I$(d))
+
+# ===============================
+# OpenCV (Linux / WSL)
+# ===============================
+OPENCV_CFLAGS := $(shell pkg-config --cflags opencv4)
+OPENCV_LIBS   := $(shell pkg-config --libs opencv4)
+ifeq ($(OS),Windows_NT)
+    # no OpenCV here
+else
+    CXXFLAGS += $(OPENCV_CFLAGS)
+endif
 
 # ===============================
 # Outputs
@@ -86,6 +103,7 @@ ifeq ($(OS),Windows_NT)
 	if not exist $(OBJ_DIR) mkdir $(OBJ_DIR)
 	for %%d in ($(SRC_DIRS)) do if not exist "$(OBJ_DIR)\%%d" mkdir "$(OBJ_DIR)\%%d"
 	for %%d in ($(TEST_DIRS)) do if not exist "$(OBJ_DIR)\%%d" mkdir "$(OBJ_DIR)\%%d"
+	for %%f in ($(ASSETS)) do copy $(ASSETS_DIR)\%%f $(BUILD_DIR)\%%f
 else
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(OBJ_DIR)
@@ -94,6 +112,9 @@ else
 	done
 	@for d in $(TEST_DIRS); do \
 		mkdir -p "$(OBJ_DIR)/$$d"; \
+	done
+	@for f in $(ASSETS); do \
+		cp $(ASSETS_DIR)/$$f $(BUILD_DIR)/$$f; \
 	done
 endif
 
@@ -104,7 +125,11 @@ all: .dirs $(TARGET)
 
 # Link with C++ to avoid unresolved C++ symbols
 $(TARGET): $(OBJ_ALL)
+ifeq ($(OS),Windows_NT)
 	$(CXX) $(CXXFLAGS) $(OBJ_ALL) -o $(TARGET)
+else
+	$(CXX) $(CXXFLAGS) $(OBJ_ALL) -o $(TARGET) $(OPENCV_LIBS)
+endif
 	@echo ==== Compilation completed: $(TARGET) ====
 
 # Compile C files

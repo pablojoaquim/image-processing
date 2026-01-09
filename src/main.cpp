@@ -81,7 +81,7 @@ extern "C"
 int main(int argc, char *argv[])
 {
     std::cout << "=== Start ===" << std::endl;
-
+    opencv_test();
     std::cout << "===  End  ===" << std::endl;
     return 0;
 }

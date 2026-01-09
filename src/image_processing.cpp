@@ -29,11 +29,8 @@
 /*===========================================================================*
  * Header Files
  *===========================================================================*/
-// #include <stddef.h>
-// #include <stdbool.h>
-// #include <stdlib.h>
-// #include <string.h>
-// #include <stdio.h>
+#include <opencv2/opencv.hpp>
+#include <iostream>
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -55,7 +52,6 @@
 /*===========================================================================*
  * Local Variables Definitions
  *===========================================================================*/
-// int working_arr[100];
 
 /*===========================================================================*
  * Local Function Prototypes
@@ -68,45 +64,22 @@
 /*===========================================================================*
  * Function Definitions
  *===========================================================================*/
+/*****************************************************************************
+ * Name         opencv_test
+ * Description  Do some tests with the opencv library
+ *****************************************************************************/
+ int opencv_test()
+ {
+    cv::Mat img = cv::imread("build/lenna.png");
 
-//  void printArr (int curr, size_t len, int *arr)
-//  {
-//     printf("-- %d ---", curr);
-//     for (size_t i = 0; i < len; ++i)
-//     {
-//         printf("%d ", arr[i]);
-//     }
-//     printf("\n");
-//  }
+    if (img.empty()) {
+        std::cout << "No se pudo cargar la imagen" << std::endl;
+        return -1;
+    }
 
-// /*****************************************************************************
-//  * Name         move_zeros
-//  * Description  Takes an array and moves all of the zeros to the end,
-//  *              preserving the order of the other elements.
-//  *****************************************************************************/
-// void move_zeros(size_t len, int *arr)
-// {
-//     // mutate arr in place
-//     int zerosCnt = 0;
-//     int i=0;
-//     while(i < (len-zerosCnt))
-//     {
-//         printArr(arr[i], len, arr);
-//         if (arr[i] == 0)
-//         {
-//             /* Move all the string one place */
-//             for (int j = i; j < len; j++)
-//             {
-//                 arr[j] = arr[j + 1];
-//             }
-//             /* Move the '0' at the end of the array */
-//             arr[len-1]=0;
-//             /* To avoid reordening the leading 0s already moved */
-//             zerosCnt++ ;
-//         }
-//         else
-//         {
-//             i++;
-//         }
-//     }
-// }
+    cv::imshow("OpenCV en WSL", img);
+    cv::waitKey(0);
+    cv::destroyAllWindows();
+    return 0;
+ }
+

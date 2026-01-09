@@ -79,16 +79,13 @@ extern "C" {
 #ifdef __cplusplus
 // @todo: Add pure C++ function prototypes here.
 
-// /*****************************************************************************
-//  * @fn         move_zeros
-//  * @brief      Takes an array and moves all of the zeros to the end, 
-//  *             preserving the order of the other elements.
-//  *             int [] {1, 2, 0, 1, 0, 1, 0, 3, 0, 1}) -> int [] {1, 2, 1, 1, 3, 1, 0, 0, 0, 0}
-//  * @param [in] len - The length of the received array
-//  * @param [in] arr - The input array
-//  * @return     None
-//  ******************************************************************************/
-// void move_zeros(size_t len, int* arr);
+/*****************************************************************************
+ * @fn         opencv_test
+ * @brief      Playground to do some tests with the openCV library
+ * @param [in] None
+ * @return     0-OK, -1-Error
+ ******************************************************************************/
+ int opencv_test();
 
 #endif /* __cplusplus */
 
