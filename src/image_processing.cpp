@@ -68,7 +68,7 @@
  * Name         drawHistogram
  * Description  Draw a histogram into a canvas with labels in the axis
  *****************************************************************************/
-static void drawHistogram(const cv::Mat& hist, int histSize, const std::string& windowName)
+static void drawHistogram(const cv::Mat &hist, int histSize, cv::Scalar color, const std::string &windowName)
 {
     // ========================
     // Histogram normalization
@@ -85,8 +85,7 @@ static void drawHistogram(const cv::Mat& hist, int histSize, const std::string& 
         hist_h + 2 * margin,
         hist_w + 2 * margin,
         CV_8UC3,
-        cv::Scalar(30, 30, 30)
-    );
+        cv::Scalar(30, 30, 30));
 
     // ========================
     // Draw the axis
@@ -97,8 +96,7 @@ static void drawHistogram(const cv::Mat& hist, int histSize, const std::string& 
         cv::Point(margin, margin),
         cv::Point(margin, margin + hist_h),
         cv::Scalar(200, 200, 200),
-        2
-    );
+        2);
 
     // X axis
     cv::line(
@@ -106,8 +104,7 @@ static void drawHistogram(const cv::Mat& hist, int histSize, const std::string& 
         cv::Point(margin, margin + hist_h),
         cv::Point(margin + hist_w, margin + hist_h),
         cv::Scalar(200, 200, 200),
-        2
-    );
+        2);
 
     // ========================
     // Add labels to the axes
@@ -119,8 +116,7 @@ static void drawHistogram(const cv::Mat& hist, int histSize, const std::string& 
         cv::FONT_HERSHEY_SIMPLEX,
         0.5,
         cv::Scalar(220, 220, 220),
-        1
-    );
+        1);
 
     cv::putText(
         histImage,
@@ -129,15 +125,15 @@ static void drawHistogram(const cv::Mat& hist, int histSize, const std::string& 
         cv::FONT_HERSHEY_SIMPLEX,
         0.5,
         cv::Scalar(220, 220, 220),
-        1
-    );
+        1);
 
     // ========================
     // Add ticks to the axes
     // ========================
     int bin_w = cvRound((double)hist_w / histSize);
 
-    for (int i = 0; i <= 255; i += 50) {
+    for (int i = 0; i <= 255; i += 50)
+    {
         int x = margin + i * bin_w;
 
         cv::line(
@@ -145,8 +141,7 @@ static void drawHistogram(const cv::Mat& hist, int histSize, const std::string& 
             cv::Point(x, margin + hist_h),
             cv::Point(x, margin + hist_h + 5),
             cv::Scalar(200, 200, 200),
-            1
-        );
+            1);
 
         cv::putText(
             histImage,
@@ -155,27 +150,24 @@ static void drawHistogram(const cv::Mat& hist, int histSize, const std::string& 
             cv::FONT_HERSHEY_SIMPLEX,
             0.4,
             cv::Scalar(200, 200, 200),
-            1
-        );
+            1);
     }
 
     // ========================
     // Draw the histogram
     // ========================
-    for (int i = 1; i < histSize; i++) {
+    for (int i = 1; i < histSize; i++)
+    {
         cv::line(
             histImage,
             cv::Point(
                 margin + (i - 1) * bin_w,
-                margin + hist_h - cvRound(hist.at<float>(i - 1))
-            ),
+                margin + hist_h - cvRound(hist.at<float>(i - 1))),
             cv::Point(
                 margin + i * bin_w,
-                margin + hist_h - cvRound(hist.at<float>(i))
-            ),
-            cv::Scalar(0, 255, 0),
-            2
-        );
+                margin + hist_h - cvRound(hist.at<float>(i))),
+            color,
+            2);
     }
 
     // ========================
@@ -283,7 +275,30 @@ int opencv_test()
         &histSize, // bins number
         &histRange // range
     );
-    drawHistogram(hist, histSize, "Histograma");
+    cv::Scalar colorGray(128, 128, 128);
+    drawHistogram(hist, histSize, colorGray, "Histogram");
+    cv::waitKey(0);
+    cv::destroyAllWindows();
+
+    // Histogram BGR
+    cv::Mat channels[3];
+    cv::split(img, channels);
+    cv::Mat& b = channels[0];
+    cv::Mat& g = channels[1];
+    cv::Mat& r = channels[2];
+    cv::Mat histB, histG, histR;
+
+    cv::calcHist(&b, 1, 0, cv::Mat(), histB, 1, &histSize, &histRange);
+    cv::calcHist(&g, 1, 0, cv::Mat(), histG, 1, &histSize, &histRange);
+    cv::calcHist(&r, 1, 0, cv::Mat(), histR, 1, &histSize, &histRange);
+
+    cv::Scalar colorB(255, 0, 0);
+    cv::Scalar colorG(0, 255, 0);
+    cv::Scalar colorR(0, 0, 255);
+    drawHistogram(histB, histSize, colorB, "Histogram - Blue");
+    drawHistogram(histG, histSize, colorG, "Histogram - Green");
+    drawHistogram(histR, histSize, colorR, "Histogram - Red");
+
     cv::waitKey(0);
     cv::destroyAllWindows();
 

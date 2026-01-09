@@ -1,24 +1,28 @@
 # Project Name
-A short description of what this project does and who it’s for.
+IMAGE PROCESSING
 
 ---
 ## Table of Contents
-* [About](#-about)
-* [Features](#-features)
-* [Tech Stack](#-tech-stack)
-* [Project Structure](#-project-structure)
-* [Getting Started](#-getting-started)
-* [Build & Run](#-build--run)
-* [Running Tests](#-running-tests)
-* [Code Coverage](#-code-coverage)
-* [Configuration](#-configuration)
+- [Project Name](#project-name)
+  - [Table of Contents](#table-of-contents)
+  - [About](#about)
+  - [Features](#features)
+  - [Tech Stack](#tech-stack)
+  - [Project Structure](#project-structure)
+  - [Getting Started](#getting-started)
+    - [Clone the repository](#clone-the-repository)
+    - [Install dependencies](#install-dependencies)
+  - [Build \& Run](#build--run)
+    - [Build](#build)
+    - [Run the executable](#run-the-executable)
+  - [Running Tests](#running-tests)
+  - [Code Coverage](#code-coverage)
+  - [Configuration](#configuration)
+  - [Common Makefile variables you can customize:](#common-makefile-variables-you-can-customize)
 
 ---
 ## About
-Write 3–5 sentences summarizing:
-* What problem your project solves
-* Why it exists
-* Key goals
+This project is mainly to develop image processing use cases. 
 
 ---
 ## Features
@@ -52,18 +56,12 @@ project/
 ## Getting Started
 ### Clone the repository
 ```bash
-git clone https://github.com/yourname/project.git
-cd project
+git clone https://github.com/pablojoaquim/image-processing.git
 ```
 ### Install dependencies
-Windows (MSYS2 / MinGW):
-```bash
-pacman -S mingw-w64-x86_64-gcc gcovr
-```
-Linux:
-```bash
-sudo apt install build-essential gcovr
-```
+sudo apt install libopencv-dev
+sudo apt install libmatplotplusplus-dev
+
 
 ---
 ## Build & Run
@@ -96,11 +94,6 @@ build/coverage/coverage.html
 ---
 ## Configuration
 Common Makefile variables you can customize:
-
-| Variable          | Description           |
-| ----------------- | --------------------- |
-| `SRC_DIRS`        | Source paths          |
-| `TEST_DIRS`       | Test paths            |
 ---
 
 
