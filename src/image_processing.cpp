@@ -107,7 +107,7 @@ int opencv_test()
 
     // Binary conversion
     cv::Mat binary;
-    // For every pixel, the same threshold value is applied. If the pixel value is 
+    // For every pixel, the same threshold value is applied. If the pixel value is
     // smaller than or equal to the threshold, it is set to 0, otherwise it is set to a maximum value
     cv::threshold(gray, binary, 128, 255, cv::THRESH_BINARY);
     std::cout << "Binary Image info: " << std::endl;
@@ -119,12 +119,22 @@ int opencv_test()
 
     // Binary conversion with the best threshold accordint to the histogram of the image
     cv::Mat binaryOtsu;
-    cv::threshold(gray, binaryOtsu, 0, 255, cv::THRESH_BINARY|cv::THRESH_OTSU);
+    cv::threshold(gray, binaryOtsu, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
     std::cout << "Binary Otsu Image info: " << std::endl;
     std::cout << "Size: " << binaryOtsu.cols << " x " << binaryOtsu.rows << std::endl;
     std::cout << "Channels: " << binaryOtsu.channels() << std::endl;
     std::cout << "Type: " << binaryOtsu.type() << std::endl;
     cv::imshow("Binary Otsu", binaryOtsu);
+    cv::waitKey(0);
+
+    // Noise reduction with GaussianBlur
+    cv::Mat blurred;
+    // This function takes a kernel and a standard deviation, which means how many pixels
+    // in vert and horiz is going to expand the color detected with the kernel.
+    // The most common is leave this parameter as 0 and OpenCV is going to calculate the
+    // optimal value according to the kernel size.
+    cv::GaussianBlur(gray, blurred, cv::Size(5, 5), 0, 0);
+    cv::imshow("Blurred", blurred);
     cv::waitKey(0);
 
     cv::destroyAllWindows();
