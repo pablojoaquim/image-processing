@@ -283,9 +283,9 @@ int opencv_test()
     // Histogram BGR
     cv::Mat channels[3];
     cv::split(img, channels);
-    cv::Mat& b = channels[0];
-    cv::Mat& g = channels[1];
-    cv::Mat& r = channels[2];
+    cv::Mat &b = channels[0];
+    cv::Mat &g = channels[1];
+    cv::Mat &r = channels[2];
     cv::Mat histB, histG, histR;
 
     cv::calcHist(&b, 1, 0, cv::Mat(), histB, 1, &histSize, &histRange);
@@ -300,6 +300,157 @@ int opencv_test()
     drawHistogram(histR, histSize, colorR, "Histogram - Red");
 
     cv::waitKey(0);
+    cv::destroyAllWindows();
+
+    return 0;
+}
+
+/*****************************************************************************
+ * Name         elems_counter
+ * Description  Count elements in an image
+ *****************************************************************************/
+int elems_counter()
+{
+    // ========================
+    // Load the image to process
+    // ========================
+    // OpenCV reads the image into a 2D matrix where every element is a pixel in BGR format
+    cv::Mat img = cv::imread("build/pils.png");
+    if (img.empty())
+    {
+        std::cout << "Error detected while reading the image" << std::endl;
+        return -1;
+    }
+    cv::imshow("Original", img);
+    cv::waitKey(0);
+
+    // ========================
+    // Grayscale conversion
+    // ========================
+    cv::Mat gray;
+    cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY); // cvtColor: convert between color spaces
+    cv::imshow("Gray", gray);
+    cv::waitKey(0);
+
+    // ========================
+    // Noise reduction with GaussianBlur
+    // ========================
+    cv::Mat blurred;
+    // This function takes a kernel and a standard deviation, which means how many pixels
+    // in vert and horiz is going to expand the color detected with the kernel.
+    // The most common is leave this parameter as 0 and OpenCV is going to calculate the
+    // optimal value according to the kernel size.
+    cv::GaussianBlur(gray, blurred, cv::Size(5, 5), 0, 0);
+    cv::imshow("GaussianBlur", blurred);
+    cv::waitKey(0);
+
+    // ========================
+    // Binary threshold detection
+    // ========================
+    cv::Mat binaryOtsu;
+    cv::threshold(blurred, binaryOtsu, 0, 255, cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
+    cv::imshow("Binary Otsu", binaryOtsu);
+    cv::waitKey(0);
+
+    // ========================
+    // Morphologycal cleaning
+    // ========================
+    // Remove some noise and separate the elements
+    cv::Mat morphclean;
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3));
+    cv::morphologyEx(binaryOtsu, morphclean, cv::MORPH_OPEN, kernel);
+    cv::imshow("Clean", morphclean);
+    cv::waitKey(0);
+
+    // // ========================
+    // // Fill the blank areas
+    // // ========================
+    // cv::Mat filled = morphclean.clone();                     // Binary copy
+    // cv::floodFill(filled, cv::Point(0, 0), cv::Scalar(255)); // Flood fill from a corner
+    // cv::bitwise_not(filled, filled);                         // Invert
+    // morphclean = morphclean | filled;
+    // cv::imshow("Image Filled", morphclean);
+    // cv::waitKey(0);
+
+    // ========================
+    // Find contours
+    // ========================
+    // std::vector<std::vector<cv::Point>> contours;
+    // cv::findContours(morphclean, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+    // int count = 0;
+    // for (const auto &c : contours)
+    // {
+    //     double area = cv::contourArea(c);
+    //     if (area > 50) // Threshold to adjust
+    //     {
+    //         count++;
+    //         cv::drawContours(img, std::vector<std::vector<cv::Point>>{c}, -1, cv::Scalar(0, 255, 0), 2);
+    //     }
+    // }
+
+    // std::cout << "Objetos detectados: " << count << std::endl;
+    // cv::imshow("Result", img);
+    // cv::waitKey(0);
+
+
+    // ========================
+    // Find contours
+    // ========================
+    // Contours are curves joining all continuous points along a boundary
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<cv::Vec4i> hierarchy;
+    cv::findContours(morphclean, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    
+    // ========================
+    // Filter and count valid pills
+    // ========================
+    int pill_count = 0;
+    cv::Mat result = img.clone(); // Clone original for visualization
+    
+    // Define size thresholds to filter out noise
+    const double MIN_AREA = 500;   // Adjust based on your image
+    const double MAX_AREA = 10000; // Adjust based on your image
+    
+    for (size_t i = 0; i < contours.size(); i++)
+    {
+        double area = cv::contourArea(contours[i]);
+        
+        // Filter by area to exclude noise and ensure valid pills
+        if (area > MIN_AREA && area < MAX_AREA)
+        {
+            // Optional: Additional shape filtering
+            // Pills are elongated, so check aspect ratio
+            cv::RotatedRect rect = cv::minAreaRect(contours[i]);
+            float aspect_ratio = std::max(rect.size.width, rect.size.height) / 
+                                std::min(rect.size.width, rect.size.height);
+            
+            // Pills typically have aspect ratio between 1.5 and 3.5
+            if (aspect_ratio > 1.3 && aspect_ratio < 4.0)
+            {
+                pill_count++;
+                
+                // Draw contours and labels for visualization
+                cv::drawContours(result, contours, i, cv::Scalar(0, 255, 0), 2);
+                
+                // Get centroid for numbering
+                cv::Moments m = cv::moments(contours[i]);
+                cv::Point center(m.m10 / m.m00, m.m01 / m.m00);
+                cv::putText(result, std::to_string(pill_count), center,
+                           cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 0, 0), 2);
+            }
+        }
+    }
+    
+    // ========================
+    // Display results
+    // ========================
+    std::cout << "Number of pills detected: " << pill_count << std::endl;
+    cv::putText(result, "Pills: " + std::to_string(pill_count), cv::Point(10, 30),
+                cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 255), 2);
+    cv::imshow("Result", result);
+    cv::waitKey(0);
+
     cv::destroyAllWindows();
 
     return 0;

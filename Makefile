@@ -113,9 +113,7 @@ else
 	@for d in $(TEST_DIRS); do \
 		mkdir -p "$(OBJ_DIR)/$$d"; \
 	done
-	@for f in $(ASSETS); do \
-		cp $(ASSETS_DIR)/$$f $(BUILD_DIR)/$$f; \
-	done
+	cp -r $(ASSETS_DIR)/* $(BUILD_DIR)/
 endif
 
 # =================================
