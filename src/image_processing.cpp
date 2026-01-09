@@ -73,9 +73,13 @@
     cv::Mat img = cv::imread("build/lenna.png");
 
     if (img.empty()) {
-        std::cout << "No se pudo cargar la imagen" << std::endl;
+        std::cout << "Error detected while reading the image" << std::endl;
         return -1;
     }
+
+    std::cout << "Size: " << img.cols << " x " << img.rows << std::endl;
+    std::cout << "Channels: " << img.channels() << std::endl;
+    std::cout << "Type: " << img.type() << std::endl;
 
     cv::imshow("OpenCV en WSL", img);
     cv::waitKey(0);
