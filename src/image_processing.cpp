@@ -68,11 +68,13 @@
  * Name         opencv_test
  * Description  Do some tests with the opencv library
  *****************************************************************************/
- int opencv_test()
- {
+int opencv_test()
+{
+    // OpenCV reads the image into a 2D matrix where every element is a pixel in BGR format
     cv::Mat img = cv::imread("build/lenna.png");
 
-    if (img.empty()) {
+    if (img.empty())
+    {
         std::cout << "Error detected while reading the image" << std::endl;
         return -1;
     }
@@ -81,9 +83,15 @@
     std::cout << "Channels: " << img.channels() << std::endl;
     std::cout << "Type: " << img.type() << std::endl;
 
+    // Vec3b is a type defined in OpenCV which represents a vector of 3 bytes (like pixel[3])
+    // img.at returns the information of the pixel at (row, col) position
+    cv::Vec3b pixel = img.at<cv::Vec3b>(100, 100);
+    std::cout << "B=" << (int)pixel[0] << std::endl
+              << "G=" << (int)pixel[1] << std::endl
+              << "R=" << (int)pixel[2] << std::endl;
+
     cv::imshow("OpenCV en WSL", img);
     cv::waitKey(0);
     cv::destroyAllWindows();
     return 0;
- }
-
+}
