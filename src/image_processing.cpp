@@ -65,6 +65,126 @@
  * Function Definitions
  *===========================================================================*/
 /*****************************************************************************
+ * Name         drawHistogram
+ * Description  Draw a histogram into a canvas with labels in the axis
+ *****************************************************************************/
+static void drawHistogram(const cv::Mat& hist, int histSize, const std::string& windowName)
+{
+    // ========================
+    // Histogram normalization
+    // ========================
+    int hist_w = 600;
+    int hist_h = 400;
+    int margin = 50;
+    cv::normalize(hist, hist, 0, hist_h, cv::NORM_MINMAX);
+
+    // ========================
+    // Create the canvas
+    // ========================
+    cv::Mat histImage(
+        hist_h + 2 * margin,
+        hist_w + 2 * margin,
+        CV_8UC3,
+        cv::Scalar(30, 30, 30)
+    );
+
+    // ========================
+    // Draw the axis
+    // ========================
+    // Y axis
+    cv::line(
+        histImage,
+        cv::Point(margin, margin),
+        cv::Point(margin, margin + hist_h),
+        cv::Scalar(200, 200, 200),
+        2
+    );
+
+    // X axis
+    cv::line(
+        histImage,
+        cv::Point(margin, margin + hist_h),
+        cv::Point(margin + hist_w, margin + hist_h),
+        cv::Scalar(200, 200, 200),
+        2
+    );
+
+    // ========================
+    // Add labels to the axes
+    // ========================
+    cv::putText(
+        histImage,
+        "Intensity (0 - 255)",
+        cv::Point(margin + hist_w / 2 - 90, margin + hist_h + 40),
+        cv::FONT_HERSHEY_SIMPLEX,
+        0.5,
+        cv::Scalar(220, 220, 220),
+        1
+    );
+
+    cv::putText(
+        histImage,
+        "Pixel count",
+        cv::Point(5, margin - 10),
+        cv::FONT_HERSHEY_SIMPLEX,
+        0.5,
+        cv::Scalar(220, 220, 220),
+        1
+    );
+
+    // ========================
+    // Add ticks to the axes
+    // ========================
+    int bin_w = cvRound((double)hist_w / histSize);
+
+    for (int i = 0; i <= 255; i += 50) {
+        int x = margin + i * bin_w;
+
+        cv::line(
+            histImage,
+            cv::Point(x, margin + hist_h),
+            cv::Point(x, margin + hist_h + 5),
+            cv::Scalar(200, 200, 200),
+            1
+        );
+
+        cv::putText(
+            histImage,
+            std::to_string(i),
+            cv::Point(x - 10, margin + hist_h + 20),
+            cv::FONT_HERSHEY_SIMPLEX,
+            0.4,
+            cv::Scalar(200, 200, 200),
+            1
+        );
+    }
+
+    // ========================
+    // Draw the histogram
+    // ========================
+    for (int i = 1; i < histSize; i++) {
+        cv::line(
+            histImage,
+            cv::Point(
+                margin + (i - 1) * bin_w,
+                margin + hist_h - cvRound(hist.at<float>(i - 1))
+            ),
+            cv::Point(
+                margin + i * bin_w,
+                margin + hist_h - cvRound(hist.at<float>(i))
+            ),
+            cv::Scalar(0, 255, 0),
+            2
+        );
+    }
+
+    // ========================
+    // Show the histogram
+    // ========================
+    cv::imshow(windowName, histImage);
+}
+
+/*****************************************************************************
  * Name         opencv_test
  * Description  Do some tests with the opencv library
  *****************************************************************************/
@@ -92,8 +212,8 @@ int opencv_test()
               << "R=" << (int)pixel[2] << std::endl;
 
     // Show the image
-    cv::imshow("OpenCV en WSL", img);
-    cv::waitKey(0);
+    // cv::imshow("OpenCV en WSL", img);
+    // cv::waitKey(0);
 
     // Grayscale conversion (this is very useful for objects and borders detection)
     cv::Mat gray;
@@ -102,8 +222,8 @@ int opencv_test()
     std::cout << "Size: " << gray.cols << " x " << gray.rows << std::endl;
     std::cout << "Channels: " << gray.channels() << std::endl;
     std::cout << "Type: " << gray.type() << std::endl;
-    cv::imshow("Gray", gray);
-    cv::waitKey(0);
+    // cv::imshow("Gray", gray);
+    // cv::waitKey(0);
 
     // Binary conversion
     cv::Mat binary;
@@ -114,8 +234,8 @@ int opencv_test()
     std::cout << "Size: " << binary.cols << " x " << binary.rows << std::endl;
     std::cout << "Channels: " << binary.channels() << std::endl;
     std::cout << "Type: " << binary.type() << std::endl;
-    cv::imshow("Binary", binary);
-    cv::waitKey(0);
+    // cv::imshow("Binary", binary);
+    // cv::waitKey(0);
 
     // Binary conversion with the best threshold accordint to the histogram of the image
     cv::Mat binaryOtsu;
@@ -124,8 +244,8 @@ int opencv_test()
     std::cout << "Size: " << binaryOtsu.cols << " x " << binaryOtsu.rows << std::endl;
     std::cout << "Channels: " << binaryOtsu.channels() << std::endl;
     std::cout << "Type: " << binaryOtsu.type() << std::endl;
-    cv::imshow("Binary Otsu", binaryOtsu);
-    cv::waitKey(0);
+    // cv::imshow("Binary Otsu", binaryOtsu);
+    // cv::waitKey(0);
 
     // Noise reduction with GaussianBlur
     cv::Mat blurred;
@@ -134,19 +254,38 @@ int opencv_test()
     // The most common is leave this parameter as 0 and OpenCV is going to calculate the
     // optimal value according to the kernel size.
     cv::GaussianBlur(gray, blurred, cv::Size(5, 5), 0, 0);
-    cv::imshow("Blurred", blurred);
-    cv::waitKey(0);
+    // cv::imshow("Blurred", blurred);
+    // cv::waitKey(0);
 
     // Edges detection (typical proces is Color -> Gray -> Blur -> Edges)
     cv::Mat edges;
-    // The function finds edges in the input image and marks them in the output map 
-    // edges using the Canny algorithm. The smallest value between threshold1 and 
-    // threshold2 is used for edge linking. The largest value is used to find initial 
+    // The function finds edges in the input image and marks them in the output map
+    // edges using the Canny algorithm. The smallest value between threshold1 and
+    // threshold2 is used for edge linking. The largest value is used to find initial
     // segments of strong edges.
     cv::Canny(blurred, edges, 50, 150);
-    cv::imshow("Edges", edges);
-    cv::waitKey(0);
+    // cv::imshow("Edges", edges);
+    // cv::waitKey(0);
 
+    // Histogram
+    // Count pixels of a determined color in the whole image and fill a vector with this information
+    int histSize = 256;       // bins
+    float range[] = {0, 256}; // possible values
+    const float *histRange = {range};
+    cv::Mat hist;
+    cv::calcHist(
+        &gray,     // source image
+        1,         // image count
+        0,         // channel (0 = grey)
+        cv::Mat(), // mask (empty)
+        hist,      // output
+        1,         // dimmension of the histogram
+        &histSize, // bins number
+        &histRange // range
+    );
+    drawHistogram(hist, histSize, "Histograma");
+    cv::waitKey(0);
     cv::destroyAllWindows();
+
     return 0;
 }
