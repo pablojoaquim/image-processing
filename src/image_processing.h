@@ -80,20 +80,28 @@ extern "C" {
 // @todo: Add pure C++ function prototypes here.
 
 /*****************************************************************************
- * @fn         opencv_test
+ * @fn         img_ImagePlayground
  * @brief      Playground to do some tests with the openCV library
  * @param [in] None
  * @return     0-OK, -1-Error
  ******************************************************************************/
- int opencv_test();
+ int img_ImagePlayground();
 
- /*****************************************************************************
- * @fn         elems_counter
+/*****************************************************************************
+ * @fn         ime_ElemsCounter
  * @brief      Count elements in an image using OpenCV library
  * @param [in] None
  * @return     0-OK, -1-Error
  ******************************************************************************/
- int elems_counter();
+ int ime_ElemsCounter();
+
+/*****************************************************************************
+ * @fn         img_VideoPlayground
+ * @brief      Play a video using the openCV library
+ * @param [in] None
+ * @return     0-OK, -1-Error
+ ******************************************************************************/
+int img_VideoPlayground();
 
 #endif /* __cplusplus */
 
