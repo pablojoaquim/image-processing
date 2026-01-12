@@ -177,10 +177,10 @@ static void drawHistogram(const cv::Mat &hist, int histSize, cv::Scalar color, c
 }
 
 /*****************************************************************************
- * Name         opencv_test
- * Description  Do some tests with the opencv library
+ * Name         img_ImagePlayground
+ * Description  Do some tests with images using the opencv library
  *****************************************************************************/
-int opencv_test()
+int img_ImagePlayground()
 {
     // OpenCV reads the image into a 2D matrix where every element is a pixel in BGR format
     cv::Mat img = cv::imread("build/lenna.png");
@@ -306,10 +306,10 @@ int opencv_test()
 }
 
 /*****************************************************************************
- * Name         elems_counter
+ * Name         ime_ElemsCounter
  * Description  Count elements in an image
  *****************************************************************************/
-int elems_counter()
+int ime_ElemsCounter()
 {
     // ========================
     // Load the image to process
@@ -393,7 +393,6 @@ int elems_counter()
     // cv::imshow("Result", img);
     // cv::waitKey(0);
 
-
     // ========================
     // Find contours
     // ========================
@@ -401,47 +400,47 @@ int elems_counter()
     std::vector<std::vector<cv::Point>> contours;
     std::vector<cv::Vec4i> hierarchy;
     cv::findContours(morphclean, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-    
+
     // ========================
     // Filter and count valid pills
     // ========================
     int pill_count = 0;
     cv::Mat result = img.clone(); // Clone original for visualization
-    
+
     // Define size thresholds to filter out noise
     const double MIN_AREA = 500;   // Adjust based on your image
     const double MAX_AREA = 10000; // Adjust based on your image
-    
+
     for (size_t i = 0; i < contours.size(); i++)
     {
         double area = cv::contourArea(contours[i]);
-        
+
         // Filter by area to exclude noise and ensure valid pills
         if (area > MIN_AREA && area < MAX_AREA)
         {
             // Optional: Additional shape filtering
             // Pills are elongated, so check aspect ratio
             cv::RotatedRect rect = cv::minAreaRect(contours[i]);
-            float aspect_ratio = std::max(rect.size.width, rect.size.height) / 
-                                std::min(rect.size.width, rect.size.height);
-            
+            float aspect_ratio = std::max(rect.size.width, rect.size.height) /
+                                 std::min(rect.size.width, rect.size.height);
+
             // Pills typically have aspect ratio between 1.5 and 3.5
             if (aspect_ratio > 1.3 && aspect_ratio < 4.0)
             {
                 pill_count++;
-                
+
                 // Draw contours and labels for visualization
                 cv::drawContours(result, contours, i, cv::Scalar(0, 255, 0), 2);
-                
+
                 // Get centroid for numbering
                 cv::Moments m = cv::moments(contours[i]);
                 cv::Point center(m.m10 / m.m00, m.m01 / m.m00);
                 cv::putText(result, std::to_string(pill_count), center,
-                           cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 0, 0), 2);
+                            cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 0, 0), 2);
             }
         }
     }
-    
+
     // ========================
     // Display results
     // ========================
@@ -451,6 +450,49 @@ int elems_counter()
     cv::imshow("Result", result);
     cv::waitKey(0);
 
+    cv::destroyAllWindows();
+
+    return 0;
+}
+
+/*****************************************************************************
+ * Name         img_VideoPlayground
+ * Description  Testing the video player using openCV
+ *****************************************************************************/
+int img_VideoPlayground()
+{
+    // Open a video file
+    cv::VideoCapture capture("build/video1.mp4");
+    // Alternative: webcam
+    // cv::VideoCapture capture(0);
+
+    if (!capture.isOpened())
+    {
+        std::cout << "Error detected while reading the file" << std::endl;
+        return -1;
+    }
+
+    cv::Mat frame;
+    while (true)
+    {
+        bool isTrue = capture.read(frame);
+
+        // Check for frames availability
+        if (!isTrue || frame.empty())
+        {
+            break;
+        }
+
+        cv::imshow("Video", frame);
+
+        // Player ends if key 'd' is pressed
+        if (cv::waitKey(20) == 'd')
+        {
+            break;
+        }
+    }
+
+    capture.release();
     cv::destroyAllWindows();
 
     return 0;

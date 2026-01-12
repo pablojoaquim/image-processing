@@ -82,7 +82,8 @@ int main(int argc, char *argv[])
 {
     std::cout << "=== Start ===" << std::endl;
     // opencv_test();
-    elems_counter();
+    // img_ImagePlayground();
+    img_VideoPlayground();
     std::cout << "===  End  ===" << std::endl;
     return 0;
 }
