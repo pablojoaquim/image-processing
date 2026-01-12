@@ -281,8 +281,8 @@ int img_ImagePlayground()
 
     // Create the rotation matrix
     cv::Mat M = cv::getRotationMatrix2D(center, angle, scale);
-    M.at<double>(0,2) += tx;
-    M.at<double>(1,2) += ty;
+    M.at<double>(0, 2) += tx;
+    M.at<double>(1, 2) += ty;
 
     // Apply the operations
     cv::Mat imgMoved;
@@ -352,6 +352,19 @@ int img_ImagePlayground()
     cv::Mat blank = cv::Mat::zeros(img.size(), CV_8UC3);
     cv::drawContours(blank, contours, -1, cv::Scalar(0, 0, 255), 1);
     cv::imshow("Contours", blank);
+
+    // =========================
+    // Adaptive Threshold
+    // =========================
+    cv::Mat adaptive;
+    cv::adaptiveThreshold(gray,
+                          adaptive,
+                          255,
+                          cv::ADAPTIVE_THRESH_GAUSSIAN_C,
+                          cv::THRESH_BINARY,
+                          11, // blockSize
+                          2); // C
+    cv::imshow("Adaptive", adaptive);
 
     cv::waitKey(0);
     cv::destroyAllWindows();
