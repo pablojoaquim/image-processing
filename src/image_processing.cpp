@@ -186,7 +186,7 @@ int img_ImagePlayground()
     // Image reading
     // =========================
     // OpenCV reads the image into a 2D matrix where every element is a pixel in BGR format
-    cv::Mat img = cv::imread("build/lenna.png");
+    cv::Mat img = cv::imread("build/pils.png");
 
     if (img.empty())
     {
@@ -270,25 +270,25 @@ int img_ImagePlayground()
     // // cv::imshow("Edges", edges);
     // // cv::waitKey(0);
 
-    // =========================
-    // Translation + Rotation + Scaling
-    // =========================
-    cv::Point2f center(img.cols / 2.0f, img.rows / 2.0f);
-    double angle = 45.0;
-    double scale = 1.0;
-    int tx = 100; // move right 100 pixels
-    int ty = 50;  // move down 50 pixels
+    // // =========================
+    // // Translation + Rotation + Scaling
+    // // =========================
+    // cv::Point2f center(img.cols / 2.0f, img.rows / 2.0f);
+    // double angle = 45.0;
+    // double scale = 1.0;
+    // int tx = 100; // move right 100 pixels
+    // int ty = 50;  // move down 50 pixels
 
-    // Create the rotation matrix
-    cv::Mat M = cv::getRotationMatrix2D(center, angle, scale);
-    M.at<double>(0,2) += tx;
-    M.at<double>(1,2) += ty;
-    
-    // Apply the operations
-    cv::Mat imgMoved;
-    cv::warpAffine(img, imgMoved, M, img.size());
-    cv::imshow("Moved", imgMoved);
-    cv::waitKey(0);
+    // // Create the rotation matrix
+    // cv::Mat M = cv::getRotationMatrix2D(center, angle, scale);
+    // M.at<double>(0,2) += tx;
+    // M.at<double>(1,2) += ty;
+
+    // // Apply the operations
+    // cv::Mat imgMoved;
+    // cv::warpAffine(img, imgMoved, M, img.size());
+    // cv::imshow("Moved", imgMoved);
+    // cv::waitKey(0);
 
     // // =========================
     // // Histogram
@@ -331,6 +331,26 @@ int img_ImagePlayground()
     // drawHistogram(histB, histSize, colorB, "Histogram - Blue");
     // drawHistogram(histG, histSize, colorG, "Histogram - Green");
     // drawHistogram(histR, histSize, colorR, "Histogram - Red");
+
+    // =========================
+    // Contours detection (elements counter)
+    // =========================
+    // Convert to grayscale
+    cv::Mat gray;
+    cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
+    cv::GaussianBlur(gray, gray, cv::Size(5, 5), 0);
+    // Threshold
+    cv::Mat thresh;
+    cv::threshold(gray, thresh, 200, 255, cv::THRESH_BINARY);
+    // Find contours
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<cv::Vec4i> hierarchy;
+    cv::findContours(thresh, contours, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
+    std::cout << "Number of contours: " << contours.size() << std::endl;
+    // Draw contours
+    cv::Mat blank = cv::Mat::zeros(img.size(), CV_8UC3);
+    cv::drawContours(blank, contours, -1, cv::Scalar(0, 0, 255), 1);
+    cv::imshow("Contours", blank);
 
     cv::waitKey(0);
     cv::destroyAllWindows();
