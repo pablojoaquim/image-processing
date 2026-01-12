@@ -182,8 +182,11 @@ static void drawHistogram(const cv::Mat &hist, int histSize, cv::Scalar color, c
  *****************************************************************************/
 int img_ImagePlayground()
 {
+    // =========================
+    // Image reading
+    // =========================
     // OpenCV reads the image into a 2D matrix where every element is a pixel in BGR format
-    cv::Mat img = cv::imread("build/lenna.png");
+    cv::Mat img = cv::imread("build/pils.png");
 
     if (img.empty())
     {
@@ -204,10 +207,12 @@ int img_ImagePlayground()
               << "R=" << (int)pixel[2] << std::endl;
 
     // Show the image
-    // cv::imshow("OpenCV en WSL", img);
-    // cv::waitKey(0);
+    cv::imshow("OpenCV en WSL", img);
+    cv::waitKey(0);
 
+    // =========================
     // Grayscale conversion (this is very useful for objects and borders detection)
+    // =========================
     cv::Mat gray;
     cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY); // cvtColor: convert between color spaces
     std::cout << "Gray Image info: " << std::endl;
@@ -217,7 +222,9 @@ int img_ImagePlayground()
     // cv::imshow("Gray", gray);
     // cv::waitKey(0);
 
-    // Binary conversion
+    // =========================
+    // // Binary conversion
+    // =========================
     cv::Mat binary;
     // For every pixel, the same threshold value is applied. If the pixel value is
     // smaller than or equal to the threshold, it is set to 0, otherwise it is set to a maximum value
@@ -229,7 +236,7 @@ int img_ImagePlayground()
     // cv::imshow("Binary", binary);
     // cv::waitKey(0);
 
-    // Binary conversion with the best threshold accordint to the histogram of the image
+    // Binary conversion with the best threshold according to the histogram of the image
     cv::Mat binaryOtsu;
     cv::threshold(gray, binaryOtsu, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
     std::cout << "Binary Otsu Image info: " << std::endl;
@@ -239,7 +246,9 @@ int img_ImagePlayground()
     // cv::imshow("Binary Otsu", binaryOtsu);
     // cv::waitKey(0);
 
+    // =========================
     // Noise reduction with GaussianBlur
+    // =========================
     cv::Mat blurred;
     // This function takes a kernel and a standard deviation, which means how many pixels
     // in vert and horiz is going to expand the color detected with the kernel.
@@ -249,7 +258,9 @@ int img_ImagePlayground()
     // cv::imshow("Blurred", blurred);
     // cv::waitKey(0);
 
+    // =========================
     // Edges detection (typical proces is Color -> Gray -> Blur -> Edges)
+    // =========================
     cv::Mat edges;
     // The function finds edges in the input image and marks them in the output map
     // edges using the Canny algorithm. The smallest value between threshold1 and
@@ -259,7 +270,29 @@ int img_ImagePlayground()
     // cv::imshow("Edges", edges);
     // cv::waitKey(0);
 
+    // =========================
+    // Translation + Rotation + Scaling
+    // =========================
+    cv::Point2f center(img.cols / 2.0f, img.rows / 2.0f);
+    double angle = 45.0;
+    double scale = 1.0;
+    int tx = 100; // move right 100 pixels
+    int ty = 50;  // move down 50 pixels
+
+    // Create the rotation matrix
+    cv::Mat M = cv::getRotationMatrix2D(center, angle, scale);
+    M.at<double>(0, 2) += tx;
+    M.at<double>(1, 2) += ty;
+
+    // Apply the operations
+    cv::Mat imgMoved;
+    cv::warpAffine(img, imgMoved, M, img.size());
+    cv::imshow("Moved", imgMoved);
+    cv::waitKey(0);
+
+    // =========================
     // Histogram
+    // =========================
     // Count pixels of a determined color in the whole image and fill a vector with this information
     int histSize = 256;       // bins
     float range[] = {0, 256}; // possible values
@@ -280,7 +313,7 @@ int img_ImagePlayground()
     cv::waitKey(0);
     cv::destroyAllWindows();
 
-    // Histogram BGR
+    // Split channels
     cv::Mat channels[3];
     cv::split(img, channels);
     cv::Mat &b = channels[0];
@@ -288,6 +321,7 @@ int img_ImagePlayground()
     cv::Mat &r = channels[2];
     cv::Mat histB, histG, histR;
 
+    // Histogram BGR
     cv::calcHist(&b, 1, 0, cv::Mat(), histB, 1, &histSize, &histRange);
     cv::calcHist(&g, 1, 0, cv::Mat(), histG, 1, &histSize, &histRange);
     cv::calcHist(&r, 1, 0, cv::Mat(), histR, 1, &histSize, &histRange);
@@ -298,6 +332,39 @@ int img_ImagePlayground()
     drawHistogram(histB, histSize, colorB, "Histogram - Blue");
     drawHistogram(histG, histSize, colorG, "Histogram - Green");
     drawHistogram(histR, histSize, colorR, "Histogram - Red");
+    cv::waitKey(0);
+
+    // =========================
+    // Contours detection (elements counter)
+    // =========================
+    // Convert to grayscale
+    cv::Mat processed;
+    cv::cvtColor(img, processed, cv::COLOR_BGR2GRAY);
+    cv::GaussianBlur(processed, processed, cv::Size(5, 5), 0);
+    // Threshold
+    cv::threshold(processed, processed, 200, 255, cv::THRESH_BINARY);
+    // Find contours
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<cv::Vec4i> hierarchy;
+    cv::findContours(processed, contours, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
+    std::cout << "Number of contours: " << contours.size() << std::endl;
+    // Draw contours
+    cv::Mat blank = cv::Mat::zeros(img.size(), CV_8UC3);
+    cv::drawContours(blank, contours, -1, cv::Scalar(0, 0, 255), 1);
+    cv::imshow("Contours", blank);
+
+    // =========================
+    // Adaptive Threshold
+    // =========================
+    cv::Mat adaptive;
+    cv::adaptiveThreshold(gray,
+                          adaptive,
+                          255,
+                          cv::ADAPTIVE_THRESH_GAUSSIAN_C,
+                          cv::THRESH_BINARY,
+                          11, // blockSize
+                          2); // C
+    cv::imshow("Adaptive", adaptive);
 
     cv::waitKey(0);
     cv::destroyAllWindows();
@@ -309,7 +376,7 @@ int img_ImagePlayground()
  * Name         ime_ElemsCounter
  * Description  Count elements in an image
  *****************************************************************************/
-int ime_ElemsCounter()
+int img_ElemsCounter()
 {
     // ========================
     // Load the image to process
@@ -502,6 +569,83 @@ int img_VideoPlayground()
     }
 
     capture.release();
+    cv::destroyAllWindows();
+
+    return 0;
+}
+
+/*****************************************************************************
+ * Name         img_DrawingShaped
+ * Description  Drawing shapes by hand
+ *****************************************************************************/
+int img_DrawingShaped()
+{
+    // Create a blank image (500x500, 3 channels, uint8)
+    cv::Mat blank = cv::Mat::zeros(500, 500, CV_8UC3);
+    cv::imshow("Blank", blank);
+    cv::waitKey(0);
+
+    // ==============================
+    // Paint the image in certain colors
+    // ==============================
+    blank(cv::Range(200, 300), cv::Range(300, 400)) = cv::Scalar(0, 0, 255);
+    cv::imshow("Red Area", blank);
+    cv::waitKey(0);
+
+    // ==============================
+    // Draw a rectangle
+    // ==============================
+    cv::rectangle(blank,
+                  cv::Point(0, 0),
+                  cv::Point(250, 500),
+                  cv::Scalar(0, 255, 0),
+                  2);
+    cv::imshow("Rectangle 1", blank);
+    cv::waitKey(0);
+
+    cv::rectangle(blank,
+                  cv::Point(0, 0),
+                  cv::Point(blank.cols / 2, blank.rows / 3),
+                  cv::Scalar(0, 255, 0),
+                  cv::FILLED);
+    cv::imshow("Rectangle 2", blank);
+    cv::waitKey(0);
+
+    // ==============================
+    // Draw a circle
+    // ==============================
+    cv::circle(blank,
+               cv::Point(250, 250),
+               40,
+               cv::Scalar(0, 0, 255),
+               -1);
+    cv::imshow("Circle", blank);
+    cv::waitKey(0);
+
+    // ==============================
+    // Draw a line
+    // ==============================
+    cv::line(blank,
+             cv::Point(20, 20),
+             cv::Point(blank.cols / 2, blank.rows / 3),
+             cv::Scalar(255, 255, 255),
+             3);
+    cv::imshow("Line", blank);
+    cv::waitKey(0);
+
+    // ==============================
+    // Write text on image
+    // ==============================
+    cv::putText(blank,
+                "hello world",
+                cv::Point(225, 225),
+                cv::FONT_HERSHEY_TRIPLEX,
+                1.0,
+                cv::Scalar(0, 255, 0),
+                2);
+    cv::imshow("Text", blank);
+    cv::waitKey(0);
+
     cv::destroyAllWindows();
 
     return 0;
