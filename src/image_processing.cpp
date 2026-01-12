@@ -461,6 +461,8 @@ int ime_ElemsCounter()
  *****************************************************************************/
 int img_VideoPlayground()
 {
+    double resize_factor = 0.75;
+
     // Open a video file
     cv::VideoCapture capture("build/video1.mp4");
     // Alternative: webcam
@@ -473,6 +475,7 @@ int img_VideoPlayground()
     }
 
     cv::Mat frame;
+    cv::Mat frameResized;
     while (true)
     {
         bool isTrue = capture.read(frame);
@@ -484,6 +487,10 @@ int img_VideoPlayground()
         }
 
         cv::imshow("Video", frame);
+
+        // Resize the frame input
+        cv::resize(frame, frameResized, cv::Size(), resize_factor, resize_factor);
+        cv::imshow("Video Resized", frameResized);
 
         // Player ends if key 'd' is pressed
         if (cv::waitKey(20) == 'd')
