@@ -506,3 +506,80 @@ int img_VideoPlayground()
 
     return 0;
 }
+
+/*****************************************************************************
+ * Name         img_DrawingShaped
+ * Description  Drawing shapes by hand
+ *****************************************************************************/
+int img_DrawingShaped()
+{
+    // Create a blank image (500x500, 3 channels, uint8)
+    cv::Mat blank = cv::Mat::zeros(500, 500, CV_8UC3);
+    cv::imshow("Blank", blank);
+    cv::waitKey(0);
+
+    // ==============================
+    // Paint the image in certain colors
+    // ==============================
+    blank(cv::Range(200, 300), cv::Range(300, 400)) = cv::Scalar(0, 0, 255);
+    cv::imshow("Red Area", blank);
+    cv::waitKey(0);
+
+    // ==============================
+    // Draw a rectangle
+    // ==============================
+    cv::rectangle(blank,
+                  cv::Point(0, 0),
+                  cv::Point(250, 500),
+                  cv::Scalar(0, 255, 0),
+                  2);
+    cv::imshow("Rectangle 1", blank);
+    cv::waitKey(0);
+
+    cv::rectangle(blank,
+                  cv::Point(0, 0),
+                  cv::Point(blank.cols / 2, blank.rows / 3),
+                  cv::Scalar(0, 255, 0),
+                  cv::FILLED);
+    cv::imshow("Rectangle 2", blank);
+    cv::waitKey(0);
+
+    // ==============================
+    // Draw a circle
+    // ==============================
+    cv::circle(blank,
+               cv::Point(250, 250),
+               40,
+               cv::Scalar(0, 0, 255),
+               -1);
+    cv::imshow("Circle", blank);
+    cv::waitKey(0);
+
+    // ==============================
+    // Draw a line
+    // ==============================
+    cv::line(blank,
+             cv::Point(20, 20),
+             cv::Point(blank.cols / 2, blank.rows / 3),
+             cv::Scalar(255, 255, 255),
+             3);
+    cv::imshow("Line", blank);
+    cv::waitKey(0);
+
+    // ==============================
+    // Write text on image
+    // ==============================
+    cv::putText(blank,
+                "hello world",
+                cv::Point(225, 225),
+                cv::FONT_HERSHEY_TRIPLEX,
+                1.0,
+                cv::Scalar(0, 255, 0),
+                2);
+    cv::imshow("Text", blank);
+    cv::waitKey(0);
+
+    cv::destroyAllWindows();
+
+    return 0;
+}
