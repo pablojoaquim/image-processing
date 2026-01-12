@@ -488,6 +488,8 @@ int img_VideoPlayground()
 
         cv::imshow("Video", frame);
 
+        // --- With the frame is possible to work as it is an image ---
+
         // Resize the frame input
         cv::resize(frame, frameResized, cv::Size(), resize_factor, resize_factor);
         cv::imshow("Video Resized", frameResized);
