@@ -88,12 +88,12 @@ extern "C" {
  int img_ImagePlayground();
 
 /*****************************************************************************
- * @fn         ime_ElemsCounter
+ * @fn         img_ElemsCounter
  * @brief      Count elements in an image using OpenCV library
  * @param [in] None
  * @return     0-OK, -1-Error
  ******************************************************************************/
- int ime_ElemsCounter();
+ int img_ElemsCounter();
 
 /*****************************************************************************
  * @fn         img_VideoPlayground
