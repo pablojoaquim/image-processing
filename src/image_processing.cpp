@@ -207,145 +207,146 @@ int img_ImagePlayground()
               << "R=" << (int)pixel[2] << std::endl;
 
     // Show the image
-    // cv::imshow("OpenCV en WSL", img);
+    cv::imshow("OpenCV en WSL", img);
+    cv::waitKey(0);
+
+    // =========================
+    // Grayscale conversion (this is very useful for objects and borders detection)
+    // =========================
+    cv::Mat gray;
+    cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY); // cvtColor: convert between color spaces
+    std::cout << "Gray Image info: " << std::endl;
+    std::cout << "Size: " << gray.cols << " x " << gray.rows << std::endl;
+    std::cout << "Channels: " << gray.channels() << std::endl;
+    std::cout << "Type: " << gray.type() << std::endl;
+    // cv::imshow("Gray", gray);
     // cv::waitKey(0);
 
-    // // =========================
-    // // Grayscale conversion (this is very useful for objects and borders detection)
-    // // =========================
-    // cv::Mat gray;
-    // cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY); // cvtColor: convert between color spaces
-    // std::cout << "Gray Image info: " << std::endl;
-    // std::cout << "Size: " << gray.cols << " x " << gray.rows << std::endl;
-    // std::cout << "Channels: " << gray.channels() << std::endl;
-    // std::cout << "Type: " << gray.type() << std::endl;
-    // // cv::imshow("Gray", gray);
-    // // cv::waitKey(0);
-
-    // // =========================
-    // // // Binary conversion
-    // // =========================
-    // cv::Mat binary;
-    // // For every pixel, the same threshold value is applied. If the pixel value is
-    // // smaller than or equal to the threshold, it is set to 0, otherwise it is set to a maximum value
-    // cv::threshold(gray, binary, 128, 255, cv::THRESH_BINARY);
-    // std::cout << "Binary Image info: " << std::endl;
-    // std::cout << "Size: " << binary.cols << " x " << binary.rows << std::endl;
-    // std::cout << "Channels: " << binary.channels() << std::endl;
-    // std::cout << "Type: " << binary.type() << std::endl;
-    // // cv::imshow("Binary", binary);
-    // // cv::waitKey(0);
-
-    // // Binary conversion with the best threshold according to the histogram of the image
-    // cv::Mat binaryOtsu;
-    // cv::threshold(gray, binaryOtsu, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
-    // std::cout << "Binary Otsu Image info: " << std::endl;
-    // std::cout << "Size: " << binaryOtsu.cols << " x " << binaryOtsu.rows << std::endl;
-    // std::cout << "Channels: " << binaryOtsu.channels() << std::endl;
-    // std::cout << "Type: " << binaryOtsu.type() << std::endl;
-    // // cv::imshow("Binary Otsu", binaryOtsu);
-    // // cv::waitKey(0);
-
-    // // =========================
-    // // Noise reduction with GaussianBlur
-    // // =========================
-    // cv::Mat blurred;
-    // // This function takes a kernel and a standard deviation, which means how many pixels
-    // // in vert and horiz is going to expand the color detected with the kernel.
-    // // The most common is leave this parameter as 0 and OpenCV is going to calculate the
-    // // optimal value according to the kernel size.
-    // cv::GaussianBlur(gray, blurred, cv::Size(5, 5), 0, 0);
-    // // cv::imshow("Blurred", blurred);
-    // // cv::waitKey(0);
-
-    // // =========================
-    // // Edges detection (typical proces is Color -> Gray -> Blur -> Edges)
-    // // =========================
-    // cv::Mat edges;
-    // // The function finds edges in the input image and marks them in the output map
-    // // edges using the Canny algorithm. The smallest value between threshold1 and
-    // // threshold2 is used for edge linking. The largest value is used to find initial
-    // // segments of strong edges.
-    // cv::Canny(blurred, edges, 50, 150);
-    // // cv::imshow("Edges", edges);
-    // // cv::waitKey(0);
-
-    // // =========================
-    // // Translation + Rotation + Scaling
-    // // =========================
-    // cv::Point2f center(img.cols / 2.0f, img.rows / 2.0f);
-    // double angle = 45.0;
-    // double scale = 1.0;
-    // int tx = 100; // move right 100 pixels
-    // int ty = 50;  // move down 50 pixels
-
-    // // Create the rotation matrix
-    // cv::Mat M = cv::getRotationMatrix2D(center, angle, scale);
-    // M.at<double>(0,2) += tx;
-    // M.at<double>(1,2) += ty;
-
-    // // Apply the operations
-    // cv::Mat imgMoved;
-    // cv::warpAffine(img, imgMoved, M, img.size());
-    // cv::imshow("Moved", imgMoved);
+    // =========================
+    // // Binary conversion
+    // =========================
+    cv::Mat binary;
+    // For every pixel, the same threshold value is applied. If the pixel value is
+    // smaller than or equal to the threshold, it is set to 0, otherwise it is set to a maximum value
+    cv::threshold(gray, binary, 128, 255, cv::THRESH_BINARY);
+    std::cout << "Binary Image info: " << std::endl;
+    std::cout << "Size: " << binary.cols << " x " << binary.rows << std::endl;
+    std::cout << "Channels: " << binary.channels() << std::endl;
+    std::cout << "Type: " << binary.type() << std::endl;
+    // cv::imshow("Binary", binary);
     // cv::waitKey(0);
 
-    // // =========================
-    // // Histogram
-    // // =========================
-    // // Count pixels of a determined color in the whole image and fill a vector with this information
-    // int histSize = 256;       // bins
-    // float range[] = {0, 256}; // possible values
-    // const float *histRange = {range};
-    // cv::Mat hist;
-    // cv::calcHist(
-    //     &gray,     // source image
-    //     1,         // image count
-    //     0,         // channel (0 = grey)
-    //     cv::Mat(), // mask (empty)
-    //     hist,      // output
-    //     1,         // dimmension of the histogram
-    //     &histSize, // bins number
-    //     &histRange // range
-    // );
-    // cv::Scalar colorGray(128, 128, 128);
-    // drawHistogram(hist, histSize, colorGray, "Histogram");
+    // Binary conversion with the best threshold according to the histogram of the image
+    cv::Mat binaryOtsu;
+    cv::threshold(gray, binaryOtsu, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+    std::cout << "Binary Otsu Image info: " << std::endl;
+    std::cout << "Size: " << binaryOtsu.cols << " x " << binaryOtsu.rows << std::endl;
+    std::cout << "Channels: " << binaryOtsu.channels() << std::endl;
+    std::cout << "Type: " << binaryOtsu.type() << std::endl;
+    // cv::imshow("Binary Otsu", binaryOtsu);
     // cv::waitKey(0);
-    // cv::destroyAllWindows();
 
-    // // Histogram BGR
-    // cv::Mat channels[3];
-    // cv::split(img, channels);
-    // cv::Mat &b = channels[0];
-    // cv::Mat &g = channels[1];
-    // cv::Mat &r = channels[2];
-    // cv::Mat histB, histG, histR;
+    // =========================
+    // Noise reduction with GaussianBlur
+    // =========================
+    cv::Mat blurred;
+    // This function takes a kernel and a standard deviation, which means how many pixels
+    // in vert and horiz is going to expand the color detected with the kernel.
+    // The most common is leave this parameter as 0 and OpenCV is going to calculate the
+    // optimal value according to the kernel size.
+    cv::GaussianBlur(gray, blurred, cv::Size(5, 5), 0, 0);
+    // cv::imshow("Blurred", blurred);
+    // cv::waitKey(0);
 
-    // cv::calcHist(&b, 1, 0, cv::Mat(), histB, 1, &histSize, &histRange);
-    // cv::calcHist(&g, 1, 0, cv::Mat(), histG, 1, &histSize, &histRange);
-    // cv::calcHist(&r, 1, 0, cv::Mat(), histR, 1, &histSize, &histRange);
+    // =========================
+    // Edges detection (typical proces is Color -> Gray -> Blur -> Edges)
+    // =========================
+    cv::Mat edges;
+    // The function finds edges in the input image and marks them in the output map
+    // edges using the Canny algorithm. The smallest value between threshold1 and
+    // threshold2 is used for edge linking. The largest value is used to find initial
+    // segments of strong edges.
+    cv::Canny(blurred, edges, 50, 150);
+    // cv::imshow("Edges", edges);
+    // cv::waitKey(0);
 
-    // cv::Scalar colorB(255, 0, 0);
-    // cv::Scalar colorG(0, 255, 0);
-    // cv::Scalar colorR(0, 0, 255);
-    // drawHistogram(histB, histSize, colorB, "Histogram - Blue");
-    // drawHistogram(histG, histSize, colorG, "Histogram - Green");
-    // drawHistogram(histR, histSize, colorR, "Histogram - Red");
+    // =========================
+    // Translation + Rotation + Scaling
+    // =========================
+    cv::Point2f center(img.cols / 2.0f, img.rows / 2.0f);
+    double angle = 45.0;
+    double scale = 1.0;
+    int tx = 100; // move right 100 pixels
+    int ty = 50;  // move down 50 pixels
+
+    // Create the rotation matrix
+    cv::Mat M = cv::getRotationMatrix2D(center, angle, scale);
+    M.at<double>(0,2) += tx;
+    M.at<double>(1,2) += ty;
+
+    // Apply the operations
+    cv::Mat imgMoved;
+    cv::warpAffine(img, imgMoved, M, img.size());
+    cv::imshow("Moved", imgMoved);
+    cv::waitKey(0);
+
+    // =========================
+    // Histogram
+    // =========================
+    // Count pixels of a determined color in the whole image and fill a vector with this information
+    int histSize = 256;       // bins
+    float range[] = {0, 256}; // possible values
+    const float *histRange = {range};
+    cv::Mat hist;
+    cv::calcHist(
+        &gray,     // source image
+        1,         // image count
+        0,         // channel (0 = grey)
+        cv::Mat(), // mask (empty)
+        hist,      // output
+        1,         // dimmension of the histogram
+        &histSize, // bins number
+        &histRange // range
+    );
+    cv::Scalar colorGray(128, 128, 128);
+    drawHistogram(hist, histSize, colorGray, "Histogram");
+    cv::waitKey(0);
+    cv::destroyAllWindows();
+
+    // Split channels
+    cv::Mat channels[3];
+    cv::split(img, channels);
+    cv::Mat &b = channels[0];
+    cv::Mat &g = channels[1];
+    cv::Mat &r = channels[2];
+    cv::Mat histB, histG, histR;
+
+    // Histogram BGR
+    cv::calcHist(&b, 1, 0, cv::Mat(), histB, 1, &histSize, &histRange);
+    cv::calcHist(&g, 1, 0, cv::Mat(), histG, 1, &histSize, &histRange);
+    cv::calcHist(&r, 1, 0, cv::Mat(), histR, 1, &histSize, &histRange);
+
+    cv::Scalar colorB(255, 0, 0);
+    cv::Scalar colorG(0, 255, 0);
+    cv::Scalar colorR(0, 0, 255);
+    drawHistogram(histB, histSize, colorB, "Histogram - Blue");
+    drawHistogram(histG, histSize, colorG, "Histogram - Green");
+    drawHistogram(histR, histSize, colorR, "Histogram - Red");
+    cv::waitKey(0);
 
     // =========================
     // Contours detection (elements counter)
     // =========================
     // Convert to grayscale
-    cv::Mat gray;
-    cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
-    cv::GaussianBlur(gray, gray, cv::Size(5, 5), 0);
+    cv::Mat processed;
+    cv::cvtColor(img, processed, cv::COLOR_BGR2GRAY);
+    cv::GaussianBlur(processed, processed, cv::Size(5, 5), 0);
     // Threshold
-    cv::Mat thresh;
-    cv::threshold(gray, thresh, 200, 255, cv::THRESH_BINARY);
+    cv::threshold(processed, processed, 200, 255, cv::THRESH_BINARY);
     // Find contours
     std::vector<std::vector<cv::Point>> contours;
     std::vector<cv::Vec4i> hierarchy;
-    cv::findContours(thresh, contours, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
+    cv::findContours(processed, contours, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
     std::cout << "Number of contours: " << contours.size() << std::endl;
     // Draw contours
     cv::Mat blank = cv::Mat::zeros(img.size(), CV_8UC3);
