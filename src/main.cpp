@@ -87,7 +87,9 @@ int main(int argc, char *argv[])
     // img_DrawingShapes();
     // img_DotsDetector();
     // img_MouseEvents();
-    img_ColorPalette();
+    // img_ColorPalette();
+    img_ReverseVideoReproduction();
+    
     std::cout << "===  End  ===" << std::endl;
     return 0;
 }
