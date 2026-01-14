@@ -104,12 +104,20 @@ extern "C" {
 int img_VideoPlayground();
 
 /*****************************************************************************
- * @fn         img_DrawingShaped
+ * @fn         img_DrawingShapes
  * @brief      Drawing shapes by hand
  * @param [in] None
  * @return     0-OK, -1-Error
  ******************************************************************************/
-int img_DrawingShaped();
+int img_DrawingShapes();
+
+/*****************************************************************************
+ * @fn         img_DotsDetector
+ * @brief      Detect and count the number of dots in an image using OpenCV library
+ * @param [in] None
+ * @return     0-OK, -1-Error
+ ******************************************************************************/
+ int img_DotsDetector();
 
 #endif /* __cplusplus */
 

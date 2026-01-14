@@ -81,10 +81,11 @@ extern "C"
 int main(int argc, char *argv[])
 {
     std::cout << "=== Start ===" << std::endl;
-    img_ImagePlayground();
+    // img_ImagePlayground();
     // img_ElemsCounter();
     // img_VideoPlayground();
-    // img_DrawingShaped();
+    // img_DrawingShapes();
+    img_DotsDetector();
     std::cout << "===  End  ===" << std::endl;
     return 0;
 }
