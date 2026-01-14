@@ -575,10 +575,10 @@ int img_VideoPlayground()
 }
 
 /*****************************************************************************
- * Name         img_DrawingShaped
+ * Name         img_DrawingShapes
  * Description  Drawing shapes by hand
  *****************************************************************************/
-int img_DrawingShaped()
+int img_DrawingShapes()
 {
     // Create a blank image (500x500, 3 channels, uint8)
     cv::Mat blank = cv::Mat::zeros(500, 500, CV_8UC3);
@@ -644,6 +644,105 @@ int img_DrawingShaped()
                 cv::Scalar(0, 255, 0),
                 2);
     cv::imshow("Text", blank);
+    cv::waitKey(0);
+
+    cv::destroyAllWindows();
+
+    return 0;
+}
+
+/*****************************************************************************
+ * Name         img_DotsDetector
+ * Description  Detect and count the number of dots in an image using OpenCV library
+ *****************************************************************************/
+int img_DotsDetector()
+{
+    // ========================
+    // Load the image to process
+    // ========================
+    // OpenCV reads the image into a 2D matrix where every element is a pixel in BGR format
+    cv::Mat img = cv::imread("build/black-dots.jpg");
+    if (img.empty())
+    {
+        std::cout << "Error detected while reading the image" << std::endl;
+        return -1;
+    }
+    cv::imshow("Original", img);
+    cv::waitKey(0);
+
+    // ========================
+    // Grayscale conversion
+    // ========================
+    cv::Mat gray;
+    cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY); // cvtColor: convert between color spaces
+    cv::imshow("Gray", gray);
+    cv::waitKey(0);
+
+    // ========================
+    // Binary threshold detection
+    // ========================
+    cv::Mat binary;
+    cv::threshold(gray, binary, 100, 255, cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
+    cv::imshow("Binary", binary);
+    cv::waitKey(0);
+
+    // ========================
+    // Contour detection
+    // ========================
+    // // Find contours
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<cv::Vec4i> hierarchy;
+    cv::findContours(binary, contours, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
+
+    // ========================
+    // Filters by area
+    // ========================
+    int dots_count = 0;
+    std::vector<std::vector<cv::Point>> valid_contours;
+    cv::Mat result = img.clone(); // Clone original for visualization
+
+    // Define size thresholds to filter out noise
+    const double MIN_AREA = 3;  // Adjust based on your image
+    const double MAX_AREA = 20; // Adjust based on your image
+
+    for (size_t i = 0; i < contours.size(); i++)
+    {
+        double area = cv::contourArea(contours[i]);
+
+        // Filter by area to exclude noise and ensure valid pills
+        if (area > MIN_AREA && area < MAX_AREA)
+        {
+            dots_count++;
+            valid_contours.push_back(contours[i]);
+            // // Optional: Additional shape filtering
+            // // Pills are elongated, so check aspect ratio
+            // cv::RotatedRect rect = cv::minAreaRect(contours[i]);
+            // float aspect_ratio = std::max(rect.size.width, rect.size.height) /
+            //                      std::min(rect.size.width, rect.size.height);
+
+            // // Pills typically have aspect ratio between 1.5 and 3.5
+            // if (aspect_ratio > 1.3 && aspect_ratio < 4.0)
+            // {
+            //     pill_count++;
+
+            //     // Draw contours and labels for visualization
+            //     cv::drawContours(result, contours, i, cv::Scalar(0, 255, 0), 2);
+
+            //     // Get centroid for numbering
+            //     cv::Moments m = cv::moments(contours[i]);
+            //     cv::Point center(m.m10 / m.m00, m.m01 / m.m00);
+            //     cv::putText(result, std::to_string(pill_count), center,
+            //                 cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 0, 0), 2);
+        }
+    }
+    // ========================
+    // Display results
+    // ========================
+    cv::drawContours(result, valid_contours, -1, cv::Scalar(0, 255, 0), 2);
+    std::cout << "Number of dots detected: " << dots_count << std::endl;
+    cv::putText(result, "Dots: " + std::to_string(dots_count), cv::Point(10, 30),
+                cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 255), 2);
+    cv::imshow("Result", result);
     cv::waitKey(0);
 
     cv::destroyAllWindows();
