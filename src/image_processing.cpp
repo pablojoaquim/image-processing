@@ -54,7 +54,7 @@
  *===========================================================================*/
 struct MouseContext
 {
-    cv::Mat* img;
+    cv::Mat *img;
     bool alive;
 };
 
@@ -65,6 +65,13 @@ struct ColorContext
     int b = 0;
     int g = 0;
     int r = 0;
+};
+
+struct CropContext
+{
+    cv::Mat image;
+    std::vector<cv::Point> refPoints;
+    std::string windowName;
 };
 
 /*===========================================================================*
@@ -79,13 +86,44 @@ struct ColorContext
  * Function Definitions
  *===========================================================================*/
 /*****************************************************************************
+ * Name         onMouseSelection
+ * Description  Callback on trackbar changes event
+ *****************************************************************************/
+void onMouseSelection(int event, int x, int y, int, void *userdata)
+{
+    auto *ctx = static_cast<CropContext *>(userdata);
+    if (!ctx)
+        return;
+
+    if (event == cv::EVENT_LBUTTONDOWN)
+    {
+        ctx->refPoints.clear();
+        ctx->refPoints.emplace_back(x, y);
+    }
+    else if (event == cv::EVENT_LBUTTONUP)
+    {
+        ctx->refPoints.emplace_back(x, y);
+
+        cv::rectangle(
+            ctx->image,
+            ctx->refPoints[0],
+            ctx->refPoints[1],
+            cv::Scalar(0, 255, 0),
+            2);
+
+        cv::imshow(ctx->windowName, ctx->image);
+    }
+}
+
+/*****************************************************************************
  * Name         onColorChange
  * Description  Callback on trackbar changes event
  *****************************************************************************/
-void onColorChange(int, void* userdata)
+void onColorChange(int, void *userdata)
 {
-    auto* ctx = static_cast<ColorContext*>(userdata);
-    if (!ctx) return;
+    auto *ctx = static_cast<ColorContext *>(userdata);
+    if (!ctx)
+        return;
 
     ctx->b = cv::getTrackbarPos("Blue", ctx->windowName);
     ctx->g = cv::getTrackbarPos("Green", ctx->windowName);
@@ -99,9 +137,9 @@ void onColorChange(int, void* userdata)
  * Name         clickEvent
  * Description  Callback to read the current mouse position and print the coordinates
  *****************************************************************************/
-static void clickEvent(int event, int x, int y, int flags, void* userdata)
+static void clickEvent(int event, int x, int y, int flags, void *userdata)
 {
-    auto* ctx = static_cast<MouseContext*>(userdata);
+    auto *ctx = static_cast<MouseContext *>(userdata);
     if (!ctx || !ctx->alive)
         return;
 
@@ -116,8 +154,7 @@ static void clickEvent(int event, int x, int y, int flags, void* userdata)
             cv::FONT_HERSHEY_SIMPLEX,
             1.0,
             cv::Scalar(255, 0, 0),
-            2
-        );
+            2);
 
         cv::imshow("image", *(ctx->img));
     }
@@ -828,8 +865,8 @@ int img_MouseEvents()
     cv::namedWindow("image");
     cv::imshow("image", img);
 
-    MouseContext ctx;   // To share some data with the mouse events callback
-    ctx.alive = true;   // To avoid the execution of mouse events enqueue once the image window is closed
+    MouseContext ctx; // To share some data with the mouse events callback
+    ctx.alive = true; // To avoid the execution of mouse events enqueue once the image window is closed
     ctx.img = &img;
     cv::setMouseCallback("image", clickEvent, &ctx);
 
@@ -851,13 +888,13 @@ int img_ColorPalette()
     ctx.image = cv::Mat::zeros(512, 512, CV_8UC3);
     ctx.windowName = "OpenCV Color Palette";
 
-    cv::namedWindow(ctx.windowName);    
+    cv::namedWindow(ctx.windowName);
     cv::imshow(ctx.windowName, ctx.image);
 
     // Trackbars
-    cv::createTrackbar("Blue",  ctx.windowName, nullptr, 255, onColorChange, &ctx);
+    cv::createTrackbar("Blue", ctx.windowName, nullptr, 255, onColorChange, &ctx);
     cv::createTrackbar("Green", ctx.windowName, nullptr, 255, onColorChange, &ctx);
-    cv::createTrackbar("Red",   ctx.windowName, nullptr, 255, onColorChange, &ctx);
+    cv::createTrackbar("Red", ctx.windowName, nullptr, 255, onColorChange, &ctx);
 
     cv::waitKey(0);
     cv::destroyAllWindows();
@@ -899,6 +936,63 @@ int img_ReverseVideoReproduction()
     }
 
     cap.release();
+    cv::destroyAllWindows();
+    return 0;
+}
+
+/*****************************************************************************
+ * Name         img_CropImage
+ * Description  Crop an image using the mouse to select the region
+ *****************************************************************************/
+int img_CropImage()
+{
+    CropContext ctx;
+
+    // ========================
+    // Load the image to process
+    // ========================
+    // OpenCV reads the image into a 2D matrix where every element is a pixel in BGR format
+    ctx.image = cv::imread("build/lenna.png");
+    if (ctx.image.empty())
+    {
+        std::cout << "Error detected while reading the image" << std::endl;
+        return -1;
+    }
+
+    ctx.windowName = "image";
+
+    cv::namedWindow(ctx.windowName);
+    cv::setMouseCallback(ctx.windowName, onMouseSelection, &ctx);
+
+    while (true)
+    {
+        cv::imshow(ctx.windowName, ctx.image);
+        int key = cv::waitKey(30);
+
+        if (key == 'c')
+            break;
+    }
+
+    if (ctx.refPoints.size() == 2)
+    {
+        // Normalize rectangle coordinates to ensure positive width and height.
+        // The user may drag the mouse in any direction (not necessarily
+        // top-left to bottom-right). cv::Rect requires a valid rectangle
+        // with width > 0 and height > 0, so we must reorder the points.
+        cv::Point p1 = ctx.refPoints[0];
+        cv::Point p2 = ctx.refPoints[1];
+
+        // As p1 could be greater than p2, I need to normalize the values
+        int x1 = std::min(p1.x, p2.x);
+        int y1 = std::min(p1.y, p2.y);
+        int x2 = std::max(p1.x, p2.x);
+        int y2 = std::max(p1.y, p2.y);
+
+        cv::Mat crop = ctx.image(cv::Rect(x1, y1, x2 - x1, y2 - y1));
+        cv::imshow("crop", crop);
+        cv::waitKey(0);
+    }
+
     cv::destroyAllWindows();
     return 0;
 }
