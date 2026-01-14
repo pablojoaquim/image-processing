@@ -863,3 +863,42 @@ int img_ColorPalette()
     cv::destroyAllWindows();
     return 0;
 }
+
+/*****************************************************************************
+ * Name         img_ReverseVideoReproduction
+ * Description  Play a video in reverse
+ *****************************************************************************/
+int img_ReverseVideoReproduction()
+{
+    cv::VideoCapture cap("build/video1.mp4");
+    if (!cap.isOpened())
+    {
+        std::cerr << "Error opening video\n";
+        return -1;
+    }
+
+    std::vector<cv::Mat> frames;
+    cv::Mat frame;
+
+    // Read all the frames
+    while (true)
+    {
+        if (!cap.read(frame))
+            break;
+
+        frames.push_back(frame.clone());
+    }
+
+    // Play in reverse
+    for (auto it = frames.rbegin(); it != frames.rend(); ++it)
+    {
+        cv::imshow("Frame", *it);
+
+        if (cv::waitKey(25) == 'q')
+            break;
+    }
+
+    cap.release();
+    cv::destroyAllWindows();
+    return 0;
+}

@@ -135,6 +135,14 @@ int img_MouseEvents();
  ******************************************************************************/
 int img_ColorPalette();
 
+/*****************************************************************************
+ * @fn         img_ReverseVideoReproduction
+ * @brief      img_ReverseVideoReproduction
+ * @param [in] None
+ * @return     0-OK, -1-Error
+ ******************************************************************************/
+int img_ReverseVideoReproduction();
+
 #endif /* __cplusplus */
 
 /*===========================================================================*/
