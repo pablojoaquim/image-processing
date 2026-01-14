@@ -90,7 +90,8 @@ int main(int argc, char *argv[])
     // img_ColorPalette();
     // img_ReverseVideoReproduction();
     // img_CropImage();
-    img_OCR();
+    // img_OCR();
+    img_TemplateMatching();
     
     std::cout << "===  End  ===" << std::endl;
     return 0;
