@@ -1049,8 +1049,8 @@ int img_OCR()
  *****************************************************************************/
 int img_TemplateMatching()
 {
-    cv::Mat img = cv::imread("build/soccer.jpg", cv::IMREAD_GRAYSCALE);
-    cv::Mat templ = cv::imread("build/soccer-ball.jpg", cv::IMREAD_GRAYSCALE);
+    cv::Mat img = cv::imread("build/PCB.png", cv::IMREAD_GRAYSCALE);
+    cv::Mat templ = cv::imread("build/xtal2.png", cv::IMREAD_GRAYSCALE);
 
     if (img.empty() || templ.empty())
     {
