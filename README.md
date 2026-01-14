@@ -17,8 +17,7 @@ IMAGE PROCESSING
     - [Run the executable](#run-the-executable)
   - [Running Tests](#running-tests)
   - [Code Coverage](#code-coverage)
-  - [Configuration](#configuration)
-  - [Common Makefile variables you can customize:](#common-makefile-variables-you-can-customize)
+  - [Tesseract OCR Setup (C++)](#tesseract-ocr-setup-c)
 
 ---
 ## About
@@ -92,8 +91,58 @@ build/coverage/coverage.html
 ```
 
 ---
-## Configuration
-Common Makefile variables you can customize:
+## Tesseract OCR Setup (C++)
+This project uses Tesseract OCR together with OpenCV to perform text recognition on images.
+Tesseract is not header-only and requires system installation, development headers, and trained language data.
+
+1. Install Tesseract OCR  
+   ```
+   sudo apt update
+   sudo apt install tesseract-ocr
+   ```
+   Verify installation:
+   ```
+   tesseract --version
+   ```
+2. Install Language Data.  
+   English is installed by default. For Spanish OCR:
+   ```
+   sudo apt install tesseract-ocr-spa
+   ```
+   Language data files (*.traineddata) are typically installed in: /usr/share/tesseract-ocr/4.00/tessdata/
+
+3. Install Development Libraries (Required for C++).  
+   These packages provide headers and libraries for linking:
+   ```
+   sudo apt install libtesseract-dev libleptonica-dev
+   ```
+   Check that headers are available:
+   ```
+   ls /usr/include/tesseract
+   ls /usr/include/leptonica
+   ```
+
+4. Build Configuration (Makefile)  
+   Relevant Makefile entries:
+  `--libs tesseract lept`
+  This automatically links against:
+  - libtesseract
+  - liblept
+  - OpenCV
+  If the program runs but OCR output is incorrect, verify:
+  - the correct language code is used ("eng", "spa", etc.)
+  - the image has sufficient contrast
+  - preprocessing (grayscale / thresholding) is applied
+
+Notes
+- Tesseract expects clean, high-contrast images
+- OCR accuracy strongly depends on preprocessing
+- GetUTF8Text() returns dynamically allocated memory and must be freed by the caller
+
+Architecture Overview
+- OpenCV: image loading and preprocessing
+- Tesseract: text recognition engine
+- Leptonica: internal image handling used by Tesseract
 ---
 
 
