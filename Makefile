@@ -69,6 +69,8 @@ CXXFLAGS += $(foreach d,$(SRC_DIRS), -I$(d))
 # ===============================
 OPENCV_CFLAGS := $(shell pkg-config --cflags opencv4)
 OPENCV_LIBS   := $(shell pkg-config --libs opencv4)
+TESSERACT_LIBS   := $(shell pkg-config --libs tesseract lept)
+
 ifeq ($(OS),Windows_NT)
     # no OpenCV here
 else
@@ -126,7 +128,7 @@ $(TARGET): $(OBJ_ALL)
 ifeq ($(OS),Windows_NT)
 	$(CXX) $(CXXFLAGS) $(OBJ_ALL) -o $(TARGET)
 else
-	$(CXX) $(CXXFLAGS) $(OBJ_ALL) -o $(TARGET) $(OPENCV_LIBS)
+	$(CXX) $(CXXFLAGS) $(OBJ_ALL) -o $(TARGET) $(OPENCV_LIBS) $(TESSERACT_LIBS)
 endif
 	@echo ==== Compilation completed: $(TARGET) ====
 
