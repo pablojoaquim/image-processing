@@ -137,11 +137,19 @@ int img_ColorPalette();
 
 /*****************************************************************************
  * @fn         img_ReverseVideoReproduction
- * @brief      img_ReverseVideoReproduction
+ * @brief      Play a video in reverse
  * @param [in] None
  * @return     0-OK, -1-Error
  ******************************************************************************/
 int img_ReverseVideoReproduction();
+
+/*****************************************************************************
+ * @fn         img_CropImage
+ * @brief      Crop an image using the mouse to select the region
+ * @param [in] None
+ * @return     0-OK, -1-Error
+ ******************************************************************************/
+int img_CropImage();
 
 #endif /* __cplusplus */
 
