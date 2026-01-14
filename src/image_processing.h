@@ -159,6 +159,17 @@ int img_CropImage();
  ******************************************************************************/
 int img_OCR();
 
+/*****************************************************************************
+ * @fn         img_TemplateMatching
+ * @brief      Perform a template matching. This is useful for simple objet 
+ *             with no scaling or rotation. The template comparisson is px by px.
+ *             This is useful for simple applications like logo detection in boxes,
+ *             screws positions detection, etc.
+ * @param [in] None
+ * @return     0-OK, -1-Error
+ ******************************************************************************/
+int img_TemplateMatching();
+
 #endif /* __cplusplus */
 
 /*===========================================================================*/

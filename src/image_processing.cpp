@@ -1039,3 +1039,67 @@ int img_OCR()
 
     return 0;
 }
+
+/*****************************************************************************
+ * Name         img_TemplateMatching
+ * Description  Perform a template matching. This is useful for simple objet 
+ *              with no scaling or rotation. The template comparisson is px by px.
+ *              This is useful for simple applications like logo detection in boxes,
+ *              screws positions detection, etc.
+ *****************************************************************************/
+int img_TemplateMatching()
+{
+    cv::Mat img = cv::imread("build/soccer.jpg", cv::IMREAD_GRAYSCALE);
+    cv::Mat templ = cv::imread("build/soccer-ball.jpg", cv::IMREAD_GRAYSCALE);
+
+    if (img.empty() || templ.empty())
+    {
+        std::cerr << "Error loading images" << std::endl;
+        return -1;
+    }
+
+    int w = templ.cols;
+    int h = templ.rows;
+
+    std::vector<int> methods = {
+        cv::TM_CCOEFF,
+        cv::TM_CCOEFF_NORMED,
+        cv::TM_CCORR,
+        cv::TM_CCORR_NORMED,
+        cv::TM_SQDIFF,
+        cv::TM_SQDIFF_NORMED
+    };
+
+    for (int method : methods)
+    {
+        cv::Mat imgCopy = img.clone();
+        cv::Mat result;
+
+        cv::matchTemplate(imgCopy, templ, result, method);
+
+        double minVal, maxVal;
+        cv::Point minLoc, maxLoc;
+        cv::minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc);
+
+        cv::Point matchLoc;
+        // According to the method the best result is located in the min or in the max
+        if (method == cv::TM_SQDIFF || method == cv::TM_SQDIFF_NORMED)
+            matchLoc = minLoc;
+        else
+            matchLoc = maxLoc;
+
+        cv::rectangle(
+            imgCopy,
+            matchLoc,
+            cv::Point(matchLoc.x + w, matchLoc.y + h),
+            cv::Scalar(255),
+            2
+        );
+
+        cv::imshow("Match", imgCopy);
+        cv::waitKey(0);
+        cv::destroyAllWindows();
+    }
+
+    return 0;
+}
