@@ -58,6 +58,15 @@ struct MouseContext
     bool alive;
 };
 
+struct ColorContext
+{
+    cv::Mat image;
+    std::string windowName;
+    int b = 0;
+    int g = 0;
+    int r = 0;
+};
+
 /*===========================================================================*
  * Local Function Prototypes
  *===========================================================================*/
@@ -69,6 +78,23 @@ struct MouseContext
 /*===========================================================================*
  * Function Definitions
  *===========================================================================*/
+/*****************************************************************************
+ * Name         onColorChange
+ * Description  Callback on trackbar changes event
+ *****************************************************************************/
+void onColorChange(int, void* userdata)
+{
+    auto* ctx = static_cast<ColorContext*>(userdata);
+    if (!ctx) return;
+
+    ctx->b = cv::getTrackbarPos("Blue", ctx->windowName);
+    ctx->g = cv::getTrackbarPos("Green", ctx->windowName);
+    ctx->r = cv::getTrackbarPos("Red", ctx->windowName);
+
+    ctx->image.setTo(cv::Scalar(ctx->b, ctx->g, ctx->r));
+    cv::imshow(ctx->windowName, ctx->image);
+}
+
 /*****************************************************************************
  * Name         clickEvent
  * Description  Callback to read the current mouse position and print the coordinates
@@ -811,5 +837,29 @@ int img_MouseEvents()
     ctx.alive = false;
     cv::destroyAllWindows();
 
+    return 0;
+}
+
+/*****************************************************************************
+ * Name         img_ColorPalette
+ * Description  Show a window with the color palette and trackbars to change it
+ *****************************************************************************/
+int img_ColorPalette()
+{
+    ColorContext ctx;
+    // Black image of 512x512
+    ctx.image = cv::Mat::zeros(512, 512, CV_8UC3);
+    ctx.windowName = "OpenCV Color Palette";
+
+    cv::namedWindow(ctx.windowName);    
+    cv::imshow(ctx.windowName, ctx.image);
+
+    // Trackbars
+    cv::createTrackbar("Blue",  ctx.windowName, nullptr, 255, onColorChange, &ctx);
+    cv::createTrackbar("Green", ctx.windowName, nullptr, 255, onColorChange, &ctx);
+    cv::createTrackbar("Red",   ctx.windowName, nullptr, 255, onColorChange, &ctx);
+
+    cv::waitKey(0);
+    cv::destroyAllWindows();
     return 0;
 }

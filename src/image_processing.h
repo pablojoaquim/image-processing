@@ -127,6 +127,14 @@ int img_DrawingShapes();
  ******************************************************************************/
 int img_MouseEvents();
 
+/*****************************************************************************
+ * @fn         img_ColorPalette
+ * @brief      Show a window with the color palette and trackbars to change it
+ * @param [in] None
+ * @return     0-OK, -1-Error
+ ******************************************************************************/
+int img_ColorPalette();
+
 #endif /* __cplusplus */
 
 /*===========================================================================*/
