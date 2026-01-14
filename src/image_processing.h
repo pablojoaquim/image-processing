@@ -170,6 +170,14 @@ int img_OCR();
  ******************************************************************************/
 int img_TemplateMatching();
 
+/*****************************************************************************
+ * @fn         img_PedestrianDetection
+ * @brief      Perform a pedestrian detection in a video using HOG.
+ * @param [in] None
+ * @return     0-OK, -1-Error
+ ******************************************************************************/
+int img_PedestrianDetection();
+
 #endif /* __cplusplus */
 
 /*===========================================================================*/

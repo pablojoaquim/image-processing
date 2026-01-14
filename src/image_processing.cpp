@@ -1103,3 +1103,81 @@ int img_TemplateMatching()
 
     return 0;
 }
+
+/*****************************************************************************
+ * Name         img_PedestrianDetection
+ * Description  Perform a pedestrian detection in a video using HOG.
+ *****************************************************************************/
+int img_PedestrianDetection()
+{
+    // ========================
+    // Create HOG descriptor
+    // ========================
+    cv::HOGDescriptor hog;
+    hog.setSVMDetector(cv::HOGDescriptor::getDefaultPeopleDetector());
+
+    // ========================
+    // Open video
+    // ========================
+    cv::VideoCapture cap("build/people.mp4");
+    if (!cap.isOpened())
+    {
+        std::cerr << "Error opening video file" << std::endl;
+        return -1;
+    }
+
+    cv::Mat frame;
+
+    while (true)
+    {
+        cap.read(frame);
+        if (frame.empty())
+            break;
+
+        // ========================
+        // Resize for performance
+        // ========================
+        if (frame.cols > 400)
+        {
+            float scale = 400.0f / frame.cols;
+            cv::resize(frame, frame, cv::Size(), scale, scale);
+        }
+
+        // ========================
+        // Detect people
+        // ========================
+        std::vector<cv::Rect> detections;
+        hog.detectMultiScale(
+            frame,
+            detections,
+            0,                  // hitThreshold
+            cv::Size(4, 4),     // winStride
+            cv::Size(8, 8),     // padding
+            1.05,               // scale
+            2.0                 // groupThreshold
+        );
+
+        // ========================
+        // Draw detections
+        // ========================
+        for (const auto& rect : detections)
+        {
+            cv::rectangle(
+                frame,
+                rect,
+                cv::Scalar(0, 0, 255),
+                2
+            );
+        }
+
+        cv::imshow("Pedestrian Detection", frame);
+
+        if (cv::waitKey(25) == 'q')
+            break;
+    }
+
+    cap.release();
+    cv::destroyAllWindows();
+
+    return 0;
+}

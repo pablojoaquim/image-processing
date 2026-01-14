@@ -91,7 +91,8 @@ int main(int argc, char *argv[])
     // img_ReverseVideoReproduction();
     // img_CropImage();
     // img_OCR();
-    img_TemplateMatching();
+    // img_TemplateMatching();
+    img_PedestrianDetection();
     
     std::cout << "===  End  ===" << std::endl;
     return 0;
