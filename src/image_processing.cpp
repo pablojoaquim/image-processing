@@ -31,6 +31,8 @@
  *===========================================================================*/
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include <tesseract/baseapi.h>
+#include <leptonica/allheaders.h>
 
 /*===========================================================================*
  * Local Preprocessor #define Constants
@@ -994,5 +996,46 @@ int img_CropImage()
     }
 
     cv::destroyAllWindows();
+    return 0;
+}
+
+/*****************************************************************************
+ * Name         img_OCR
+ * Description  Perform an OCR over an image using the Tesseract library
+ *****************************************************************************/
+int img_OCR()
+{
+    cv::Mat img = cv::imread("build/text.png");
+    if (img.empty())
+        return -1;
+
+    cv::Mat toOCR;
+    cv::cvtColor(img, toOCR, cv::COLOR_BGR2GRAY);
+    cv::threshold(toOCR, toOCR, 240, 255, cv::THRESH_BINARY_INV);
+    cv::imshow("toOCR", toOCR);
+    cv::waitKey(0);
+
+    tesseract::TessBaseAPI ocr;
+
+    if (ocr.Init(nullptr, "eng"))  // "eng" o "spa"
+    {
+        std::cerr << "Could not initialize tesseract\n";
+        return -1;
+    }
+
+    ocr.SetImage(
+        toOCR.data,
+        toOCR.cols,
+        toOCR.rows,
+        1,
+        toOCR.step
+    );
+
+    char* text = ocr.GetUTF8Text();
+    std::cout << text << std::endl;
+
+    delete[] text;
+    ocr.End();
+
     return 0;
 }
