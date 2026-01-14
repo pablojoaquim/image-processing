@@ -52,6 +52,11 @@
 /*===========================================================================*
  * Local Variables Definitions
  *===========================================================================*/
+struct MouseContext
+{
+    cv::Mat* img;
+    bool alive;
+};
 
 /*===========================================================================*
  * Local Function Prototypes
@@ -64,6 +69,34 @@
 /*===========================================================================*
  * Function Definitions
  *===========================================================================*/
+/*****************************************************************************
+ * Name         clickEvent
+ * Description  Callback to read the current mouse position and print the coordinates
+ *****************************************************************************/
+static void clickEvent(int event, int x, int y, int flags, void* userdata)
+{
+    auto* ctx = static_cast<MouseContext*>(userdata);
+    if (!ctx || !ctx->alive)
+        return;
+
+    if (event == cv::EVENT_LBUTTONDOWN)
+    {
+        std::cout << x << " " << y << std::endl;
+
+        cv::putText(
+            *(ctx->img),
+            std::to_string(x) + "," + std::to_string(y),
+            cv::Point(x, y),
+            cv::FONT_HERSHEY_SIMPLEX,
+            1.0,
+            cv::Scalar(255, 0, 0),
+            2
+        );
+
+        cv::imshow("image", *(ctx->img));
+    }
+}
+
 /*****************************************************************************
  * Name         drawHistogram
  * Description  Draw a histogram into a canvas with labels in the axis
@@ -745,6 +778,37 @@ int img_DotsDetector()
     cv::imshow("Result", result);
     cv::waitKey(0);
 
+    cv::destroyAllWindows();
+
+    return 0;
+}
+
+/*****************************************************************************
+ * Name         img_MouseEvents
+ * Description  Detect a mouse click event and print the coordinates
+ *****************************************************************************/
+int img_MouseEvents()
+{
+    // ========================
+    // Load the image to process
+    // ========================
+    // OpenCV reads the image into a 2D matrix where every element is a pixel in BGR format
+    cv::Mat img = cv::imread("build/lenna.png");
+    if (img.empty())
+    {
+        std::cout << "Error detected while reading the image" << std::endl;
+        return -1;
+    }
+    cv::namedWindow("image");
+    cv::imshow("image", img);
+
+    MouseContext ctx;   // To share some data with the mouse events callback
+    ctx.alive = true;   // To avoid the execution of mouse events enqueue once the image window is closed
+    ctx.img = &img;
+    cv::setMouseCallback("image", clickEvent, &ctx);
+
+    cv::waitKey(0);
+    ctx.alive = false;
     cv::destroyAllWindows();
 
     return 0;

@@ -119,6 +119,14 @@ int img_DrawingShapes();
  ******************************************************************************/
  int img_DotsDetector();
 
+/*****************************************************************************
+ * @fn         img_MouseEvents
+ * @brief      Detect a mouse click event and paint the pixels on that coordinate
+ * @param [in] None
+ * @return     0-OK, -1-Error
+ ******************************************************************************/
+int img_MouseEvents();
+
 #endif /* __cplusplus */
 
 /*===========================================================================*/
