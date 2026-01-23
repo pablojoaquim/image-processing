@@ -178,6 +178,14 @@ int img_TemplateMatching();
  ******************************************************************************/
 int img_PedestrianDetection();
 
+/*****************************************************************************
+ * @fn         img_StreamingWebcam
+ * @brief      Get the stream of a camera from an IP port
+ * @param [in] None
+ * @return     0-OK, -1-Error
+ ******************************************************************************/
+int img_StreamingWebcam();
+
 #endif /* __cplusplus */
 
 /*===========================================================================*/

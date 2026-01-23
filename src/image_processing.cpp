@@ -1017,7 +1017,7 @@ int img_OCR()
 
     tesseract::TessBaseAPI ocr;
 
-    if (ocr.Init(nullptr, "eng"))  // "eng" o "spa"
+    if (ocr.Init(nullptr, "eng")) // "eng" o "spa"
     {
         std::cerr << "Could not initialize tesseract\n";
         return -1;
@@ -1028,10 +1028,9 @@ int img_OCR()
         toOCR.cols,
         toOCR.rows,
         1,
-        toOCR.step
-    );
+        toOCR.step);
 
-    char* text = ocr.GetUTF8Text();
+    char *text = ocr.GetUTF8Text();
     std::cout << text << std::endl;
 
     delete[] text;
@@ -1042,7 +1041,7 @@ int img_OCR()
 
 /*****************************************************************************
  * Name         img_TemplateMatching
- * Description  Perform a template matching. This is useful for simple objet 
+ * Description  Perform a template matching. This is useful for simple objet
  *              with no scaling or rotation. The template comparisson is px by px.
  *              This is useful for simple applications like logo detection in boxes,
  *              screws positions detection, etc.
@@ -1067,8 +1066,7 @@ int img_TemplateMatching()
         cv::TM_CCORR,
         cv::TM_CCORR_NORMED,
         cv::TM_SQDIFF,
-        cv::TM_SQDIFF_NORMED
-    };
+        cv::TM_SQDIFF_NORMED};
 
     for (int method : methods)
     {
@@ -1093,8 +1091,7 @@ int img_TemplateMatching()
             matchLoc,
             cv::Point(matchLoc.x + w, matchLoc.y + h),
             cv::Scalar(255),
-            2
-        );
+            2);
 
         cv::imshow("Match", imgCopy);
         cv::waitKey(0);
@@ -1150,24 +1147,23 @@ int img_PedestrianDetection()
         hog.detectMultiScale(
             frame,
             detections,
-            0,                  // hitThreshold
-            cv::Size(4, 4),     // winStride
-            cv::Size(8, 8),     // padding
-            1.05,               // scale
-            2.0                 // groupThreshold
+            0,              // hitThreshold
+            cv::Size(4, 4), // winStride
+            cv::Size(8, 8), // padding
+            1.05,           // scale
+            2.0             // groupThreshold
         );
 
         // ========================
         // Draw detections
         // ========================
-        for (const auto& rect : detections)
+        for (const auto &rect : detections)
         {
             cv::rectangle(
                 frame,
                 rect,
                 cv::Scalar(0, 0, 255),
-                2
-            );
+                2);
         }
 
         cv::imshow("Pedestrian Detection", frame);
@@ -1180,4 +1176,40 @@ int img_PedestrianDetection()
     cv::destroyAllWindows();
 
     return 0;
+}
+
+/*****************************************************************************
+ * Name         img_StreamingWebcam
+ * Description  Get the stream of a camera from an IP port
+ *****************************************************************************/
+int img_StreamingWebcam()
+{
+    // ========================
+    // Open video
+    // ========================
+    cv::VideoCapture cap("udp://172.27.0.1:5000?fifo_size=1000000&overrun_nonfatal=1&buffer_size=65536", cv::CAP_FFMPEG);
+    cap.set(cv::CAP_PROP_BUFFERSIZE, 1);
+
+    if (!cap.isOpened())
+    {
+        std::cerr << "Error opening video file" << std::endl;
+        return -1;
+    }
+
+    cv::Mat frame;
+
+    while (true)
+    {
+        if (!cap.read(frame))
+        {
+            std::cerr << "Frame no recibido" << std::endl;
+            continue;
+        }
+
+        cv::imshow("WSL UDP Camera", frame);
+
+        // ESC para salir
+        if (cv::waitKey(1) == 27)
+            break;
+    }
 }

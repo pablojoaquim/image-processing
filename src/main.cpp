@@ -92,7 +92,8 @@ int main(int argc, char *argv[])
     // img_CropImage();
     // img_OCR();
     // img_TemplateMatching();
-    img_PedestrianDetection();
+    // img_PedestrianDetection();
+    img_StreamingWebcam();
     
     std::cout << "===  End  ===" << std::endl;
     return 0;
